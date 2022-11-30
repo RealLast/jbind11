@@ -1,7 +1,7 @@
 #pragma once
 #include <jni.h>
 #include <string>
-
+#include "StringUtils.hpp"
 namespace jbind
 {
     namespace JNIUtils
@@ -30,6 +30,11 @@ namespace jbind
             return stdString;
         }
 
+        static inline jclass getClassOfObject(JNIEnv* env, jobject object)
+        {
+            return env->GetObjectClass(object);
+        }
+
         static inline std::string getNameOfClassOfObject(JNIEnv* env, jobject object)
         {
             jclass cls = getClassOfObject(env, object);
@@ -39,9 +44,6 @@ namespace jbind
             return className;
         }
 
-        static inline jclass getClassOfObject(JNIEnv* env, jobject object)
-        {
-            return env->GetObjectClass(object);
-        }
+        
     }
 }

@@ -3,3 +3,7 @@
 #include "TypeCheckerUtils.hpp"
 #include "PrimitiveUtils/PrimitiveClassNames.hpp"
 #include "PrimitiveUtils/PrimitiveSignatures.hpp"
+#include "PrimitiveUtils/PrimitiveGetterFunctions.hpp"
+#include "PrimitiveUtils/PrimitiveMethods.hpp"
+#include "ClassFactoryUtils.hpp"
+#include "StringUtils.hpp"

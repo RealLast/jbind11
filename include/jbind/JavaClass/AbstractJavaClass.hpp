@@ -10,5 +10,7 @@ namespace jbind
             }
 
             virtual void print() = 0;
+
+            virtual const std::string& getClassName() const = 0; 
     };
 }

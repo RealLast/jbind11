@@ -1,14 +1,15 @@
 #pragma once
 
-#include "jbind/JavaClass/AbstractJavaClass.hpp"
+#include "JavaClass/AbstractJavaClass.hpp"
 #include <vector>
 #include <memory.h>
+#include "jbind_throw.hpp"
 namespace jbind
 {
     class JavaPackage
     {
         private:    
-            std::vector<std::unique_ptr<AbstractJavaClass>> javaClasses; 
+            std::map<std::string, std::unique_ptr<AbstractJavaClass>> javaClasses; 
 
             std::string packageName;
 
@@ -26,15 +27,33 @@ namespace jbind
      
                 std::unique_ptr<AbstractJavaClass> uniquePtr = std::unique_ptr<AbstractJavaClass>(cls); 
             
-                this->javaClasses.push_back(std::move(uniquePtr));
+                this->javaClasses.insert(std::make_pair(uniquePtr->getClassName(), std::move(uniquePtr)));
+            }
+
+            bool hasClass(const std::string& name) const
+            {
+                auto it = this->javaClasses.find(name);
+                return it != this->javaClasses.end();
+            }
+
+            AbstractJavaClass* getClass(const std::string& name)
+            {
+                auto it = this->javaClasses.find(name);
+                if(it == this->javaClasses.end())
+                {
+                    JBIND_THROW("Error, cannot find JavaClass \"" << name << "\" in JavaPackage \"" << packageName << "\"."
+                    << "The class was not registered to the package.");
+                }
+
+                return it->second.get();
             }
 
             void print()
             {
-                printf("Printing package %s %d\n", packageName.c_str(), this->javaClasses.size());
-                for(std::unique_ptr<AbstractJavaClass>& javaClass : javaClasses)
+                printf("Printing package %s %lu\n", packageName.c_str(), this->javaClasses.size());
+                for(auto& entry : javaClasses)
                 {
-                    javaClass->print();
+                    entry.second->print();
                 }
             }
     };

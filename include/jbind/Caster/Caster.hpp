@@ -17,7 +17,7 @@ namespace jbind
 
             static jobject toJavaObject(T& value)
             {
-                return nullptr;
+                throw std::runtime_error("Cannot convert to java object bla");
             }
     };
 }

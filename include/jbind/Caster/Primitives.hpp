@@ -35,10 +35,12 @@ Boolean     true, false                                                         
 */
 
 #include "JNIUtils/JNIUtils.hpp"
+#include "TypeName.hpp"
+#include "jbind_throw.hpp"
 
 namespace jbind
 {
-    template<class T>
+    template<typename T>
     struct Caster<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> 
     {
         public:
@@ -56,19 +58,32 @@ namespace jbind
 
                 // Get the function of the java object that can be used to retrieve the primitive (e.g., integerValue, floatValue, ... as in
                 // Integer(42).integerValue() etc.)
-                std::string signature = "()" + Signatures::Primitive::getSignatureOfPrimitiveType<T>();
-                std::string getterMethodName = getGetterFunctionNameUsedToRetrievePrimitiveFromJavaObject<T>().c_str();
+                std::string signature = "()" + JNIUtils::getSignatureOfPrimitiveType<T>();
+                std::string getterMethodName = JNIUtils::getGetterFunctionNameUsedToRetrievePrimitiveFromJavaObject<T>().c_str();
 
-                jclass objectClass = getClassOfObject(env, javaObject);
+                jclass objectClass = JNIUtils::getClassOfObject(env, javaObject);
                 jmethodID mGetValue = env->GetMethodID(objectClass, getterMethodName.c_str(), signature.c_str());
                 env->DeleteLocalRef(objectClass);
                 if(mGetValue == NULL)
                 {
-                    CLAID_THROW(Exception, "Error, cannot convert java object of type \"" << className << "\" to native C++ primitive \"" << TypeChecking::getCompilerSpecificCompileTypeNameOfClass<T>() << "\"."
+                    JBIND_THROW("Error, cannot convert java object of type \"" << className << "\" to native C++ primitive \"" << TypeName<T>::get() << "\"."
                     << "Method \"" << getterMethodName << "\" was not found in object of type \"" << className << "\"");
                 } 
 
-                nativePrimitive = callPrimitiveMethod<T>(env, javaObject, mGetValue);
+                T nativePrimitive = JNIUtils::callPrimitiveMethod<T>(env, javaObject, mGetValue);
+
+                return nativePrimitive;
+            }
+
+            static jobject toJavaObject(JNIEnv* env, T& value)
+            {
+                // Converts C++ int to java.lang.Integer, C++ float to java.lang.Float and so on.
+                std::string primitiveClassName  =   JNIUtils::getJavaClassNameOfPrimitiveType<T>();
+                std::string signature           =   JNIUtils::getSignatureOfPrimitiveType<T>();
+
+                jobject javaObject = 
+                    JNIUtils::createObjectFromClassName(env, primitiveClassName, signature, value);
+                return javaObject;
             }
     };
 }

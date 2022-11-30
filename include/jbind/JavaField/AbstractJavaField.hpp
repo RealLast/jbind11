@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include "JavaHandle.hpp"
-
+#include <jni.h>
 namespace jbind
 {
+    struct JavaHandle;
     // A JavaField stores the name of a field of a java class as well as
     // the pointer to member of the wrapped class (see JavaPrimitiveField and JavaObjectField).
     // It allows to access the member value of a wrapped JavaClass, if a JavaHandle to the associated class object is provided.
@@ -59,7 +59,7 @@ namespace jbind
 
             // Exctracts the C++ instance from the handle, and uses the pointer to member to 
             // convert the member to a Java object.
-            virtual jobject getValueFromHandle(JavaHandle& javaHandle) = 0;
+            virtual jobject getValueFromHandle(JNIEnv* env, JavaHandle& javaHandle) = 0;
 
           //  virtual void* getPointerToMember(JavaHandle* handle);
 

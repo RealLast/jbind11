@@ -1,38 +1,40 @@
 #pragma once
 
 #include "AbstractJavaField.hpp"
-
+#include "JavaField.hpp"
+#include "JavaHandle/JavaHandle.hpp"
+#include <type_traits>
 namespace jbind
 {
     template<typename Class, typename T>
-    class JavaPrimitiveField : public AbstractJavaField
+    struct JavaField<Class, T, typename std::enable_if<std::is_arithmetic<T>::value>::type> : public AbstractJavaField
     {
         private:
             T Class::*ptr;
 
         public:
-            JavaPrimitiveField() : AbstractJavaField("")
+            JavaField() : AbstractJavaField("")
             {
 
             }
 
-            JavaPrimitiveField(const std::string& name, T Class::*ptr) : AbstractJavaField(name), ptr(ptr)
+            JavaField(const std::string& name, T Class::*ptr) : AbstractJavaField(name), ptr(ptr)
             {
 
             }
 
             // Exctracts the C++ instance from the handle, and uses the pointer to member to 
             // convert the member to a Java object.
-            virtual jobject getValueFromHandle(JavaHandle& javaHandle)
+            virtual jobject getValueFromHandle(JNIEnv* env, JavaHandle& javaHandle)
             {
                 Class instance = javaHandle.get<Class>();
-                return get(instance);
+                return get(env, instance);
             }
      
-            virtual jobject get(Class& handle)
+            virtual jobject get(JNIEnv* env, Class& handle)
             {
                 T value = handle.*ptr;
-                return Caster<T>::toJavaObject(value);
+                return Caster<T>::toJavaObject(env, value);
             }
 
             virtual std::string getFieldDeclaration()

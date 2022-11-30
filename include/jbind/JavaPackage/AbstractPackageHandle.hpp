@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "AbstractJavaClass.hpp"
+#include "JavaClass/AbstractJavaClass.hpp"
 
 namespace jbind
 {
