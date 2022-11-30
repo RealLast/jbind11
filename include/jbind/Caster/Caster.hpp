@@ -14,5 +14,10 @@ namespace jbind
             {
                 throw std::runtime_error("Cannot cast type bla");
             }
+
+            static jobject toJavaObject(T& value)
+            {
+                return nullptr;
+            }
     };
 }

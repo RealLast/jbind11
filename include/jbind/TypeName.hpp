@@ -14,7 +14,7 @@ namespace jbind
     template<typename T>
     struct TypeName
     {
-        template<typename T>
+   
         static std::string get()
         {
             std::string name = typeid(T).name();

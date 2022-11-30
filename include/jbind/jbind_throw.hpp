@@ -7,5 +7,6 @@
 {\
 	std::ostringstream ex_str;\
 	ex_str << msg;\
-	throw std::runtime_error(ex_str.str(), __FILE__, __LINE__); \
+	ex_str << "(" << __FILE__ << " " << __LINE__ << ")";\
+	throw std::runtime_error(ex_str.str()); \
 }

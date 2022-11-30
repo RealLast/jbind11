@@ -3,6 +3,7 @@
 #include <jni.h>
 #include "Caster/Caster.hpp"
 #include "JavaPackage/JavaPackageInitializer.hpp"
+#include "JavaClass/JavaClass.hpp"
 
 #include "jbind_macros.hpp"
 
