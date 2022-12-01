@@ -1,6 +1,7 @@
 #pragma once
 #include <jni.h>
 #include "ClassLoader/ClassLoader.hpp"
+#include "StringUtils.hpp"
 namespace jbind
 {
     namespace JNIUtils
@@ -8,6 +9,7 @@ namespace jbind
         template<typename... Parameters>
         static jobject createObjectFromClassName(JNIEnv* env, std::string className, std::string constructorParameters, Parameters... parameters)
         {  
+            stringReplaceAll(className, ".", "/");
             jclass cls = ClassLoader::findClass(env, className.c_str());
 
             if(cls == nullptr)
@@ -23,7 +25,7 @@ namespace jbind
                 JBIND_THROW("Cannot create java object, failed to lookup constructor for class " << className);
             }
 
-            object = env->NewObject(cls, constructor, parameters...);
+            jobject object = env->NewObject(cls, constructor, parameters...);
 
             if(object == nullptr)
             {
@@ -31,6 +33,8 @@ namespace jbind
             }
 
             env->DeleteLocalRef(cls);
+
+            return object;
         }
     }
 }

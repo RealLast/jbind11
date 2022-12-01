@@ -4,6 +4,9 @@
 #include "JavaField.hpp"
 #include "JavaHandle/JavaHandle.hpp"
 #include <type_traits>
+
+#include "cast.hpp"
+
 namespace jbind
 {
     template<typename Class, typename T>

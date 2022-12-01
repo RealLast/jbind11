@@ -10,7 +10,7 @@ namespace jbind
     class Caster
     {
         public:
-            static T cast(JNIEnv* env, jobject& javaObject)
+            static T cast(JNIEnv* env, jobject javaObject)
             {
                 throw std::runtime_error("Cannot cast type bla");
             }

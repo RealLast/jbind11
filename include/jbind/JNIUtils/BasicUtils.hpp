@@ -44,6 +44,14 @@ namespace jbind
             return className;
         }
 
+        static inline jmethodID getMethodID(JNIEnv* env, jobject object, const char* methodName, const char* signature)
+        {
+            jclass cls = getClassOfObject(env, object);
+            jmethodID methodID = env->GetMethodID(cls, methodName, signature);
+            env->DeleteLocalRef(cls);
+            return methodID;
+        }
+
         
     }
 }

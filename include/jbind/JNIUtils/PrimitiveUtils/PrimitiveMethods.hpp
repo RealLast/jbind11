@@ -7,7 +7,7 @@ namespace jbind
     namespace JNIUtils
     {
         template<typename T>
-        static inline typename std::enable_if<std::is_same<T, int8_t>::value || std::is_same<T, uint8_t>::value, std::string>::type
+        static inline typename std::enable_if<std::is_same<T, int8_t>::value || std::is_same<T, uint8_t>::value, T>::type
         callPrimitiveMethod(JNIEnv* env, jobject& object, jmethodID methodID)
         {
 
@@ -54,7 +54,7 @@ namespace jbind
         // Note that Java's Character class is 16 bit. 
         // Further note: char16_t can neither be signed nor unsigned.
         template<typename T>
-        static inline typename std::enable_if<std::is_same<T, char16_t>::value, std::string>::type
+        static inline typename std::enable_if<std::is_same<T, char16_t>::value, T>::type
         callPrimitiveMethod(JNIEnv* env, jobject& object, jmethodID methodID)
         {
             return env->CallCharMethod(object, methodID);

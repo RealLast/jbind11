@@ -44,7 +44,7 @@ namespace jbind
     struct Caster<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> 
     {
         public:
-            static T cast(JNIEnv* env, jobject& javaObject)
+            static T cast(JNIEnv* env, jobject javaObject)
             {
                 std::string className = JNIUtils::getNameOfClassOfObject(env, javaObject);
                 std::string expectedJavaPrimitiveClassName = JNIUtils::getJavaClassNameOfPrimitiveType<T>();
