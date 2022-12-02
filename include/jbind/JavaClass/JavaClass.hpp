@@ -10,7 +10,7 @@
 #include "JavaPackage/JavaPackageHandle.hpp"
 #include "TypeName.hpp"
 #include "jbind_throw.hpp"
-#include "JavaField/JavaPrimitiveField.hpp"
+#include "JavaField/JavaField.hpp"
 
 namespace jbind
 {

@@ -69,7 +69,7 @@ namespace jbind
 
         public:
 
-            static std::vector<Value> cast(JNIEnv* env, jobject javaObject)
+            static std::vector<Value> fromJavaObject(JNIEnv* env, jobject javaObject)
             {
                 std::vector<Value> result;
                 // if the java object is a plain array, e.g. jbyte array
@@ -89,13 +89,13 @@ namespace jbind
 
                 for(size_t i = 0; i < javaArrayList.size(env); i++)
                 {
-                    result.push_back(Caster<Value>::cast(env, javaArrayList.get(env, i)));
+                    result.push_back(Caster<Value>::fromJavaObject(env, javaArrayList.get(env, i)));
                 }
 
                 return result;
             }
 
-            static jobject toJavaObject(JNIEnv* env, std::vector<Value>& vector)
+            static jobject cast(JNIEnv* env, std::vector<Value>& vector)
             {
                 // we map vector to ArrayList. Since both are native types in their corresponding language,
                 // we copy the values.
@@ -104,7 +104,7 @@ namespace jbind
 
                 for(Value& value : vector)
                 {
-                    arrayList.add(env, Caster<Value>::toJavaObject(env, value));
+                    arrayList.add(env, Caster<Value>::cast(env, value));
                 }
 
                 return arrayList.getJavaObject();

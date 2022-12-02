@@ -1,7 +1,6 @@
 #pragma once
 #include "jbind/cast.hpp"
-
-
+#include "JavaHandle/JavaHandle.hpp"
 namespace jbind
 {
     template<typename Class, typename T, class Enable = void>
@@ -31,8 +30,8 @@ namespace jbind
      
             virtual jobject get(JNIEnv* env, Class& handle)
             {
-                T value = handle.*ptr;
-                return Caster<T>::toJavaObject(env, value);
+                T& value = handle.*ptr;
+                return Caster<T>::cast(env, value);
             }
 
             virtual std::string getFieldDeclaration()

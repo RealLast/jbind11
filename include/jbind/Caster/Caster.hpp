@@ -3,19 +3,29 @@
 #include <jni.h>
 #include <stdexcept>
 
+#include "JavaClass/JavaClass.hpp"
+#include "JavaHandle/JavaHandle.hpp"
 
+// Default caster
 namespace jbind
 {
     template<typename T, class Enable = void>
     class Caster
     {
         public:
-            static T cast(JNIEnv* env, jobject javaObject)
+            static T fromJavaObject(JNIEnv* env, jobject javaObject)
             {
-                throw std::runtime_error("Cannot cast type bla");
+                JavaHandle* handle = 
+                    JavaHandle::getHandleFromObject(env, javaObject);
+                return handle->get<T>();
+                // jfieldID = JNIUtils::getFieldOfClassOfObject(env, javaObject, "javaHandle", "J")
+                // if(JNIUtils::hasObjectField(env, javaObject))
+                // {
+
+                // }
             }
 
-            static jobject toJavaObject(T& value)
+            static jobject cast(T& value)
             {
                 throw std::runtime_error("Cannot convert to java object bla");
             }

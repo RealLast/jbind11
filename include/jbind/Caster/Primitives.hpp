@@ -44,7 +44,7 @@ namespace jbind
     struct Caster<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> 
     {
         public:
-            static T cast(JNIEnv* env, jobject javaObject)
+            static T fromJavaObject(JNIEnv* env, jobject javaObject)
             {
                 std::string className = JNIUtils::getNameOfClassOfObject(env, javaObject);
                 std::string expectedJavaPrimitiveClassName = JNIUtils::getJavaClassNameOfPrimitiveType<T>();
@@ -75,7 +75,7 @@ namespace jbind
                 return nativePrimitive;
             }
 
-            static jobject toJavaObject(JNIEnv* env, T& value)
+            static jobject cast(JNIEnv* env, T& value)
             {
                 // Converts C++ int to java.lang.Integer, C++ float to java.lang.Float and so on.
                 std::string primitiveClassName  =   JNIUtils::getJavaClassNameOfPrimitiveType<T>();

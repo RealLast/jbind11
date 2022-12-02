@@ -8,3 +8,4 @@
 #include "PrimitiveUtils/PrimitiveArray.hpp"
 #include "ClassFactoryUtils.hpp"
 #include "StringUtils.hpp"
+#include "FieldUtils.hpp"
