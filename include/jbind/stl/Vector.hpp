@@ -140,7 +140,7 @@ namespace jbind
     
 
             std::stringstream setterDeclaration;
-            setterDeclaration << "public void " << "set_" << fieldName << "(" << JNIUtils::getPrimitiveArrayTypeDeclaration<T>() << " value)"
+            setterDeclaration << "public void " << "set_" << fieldName << " (" << JNIUtils::getPrimitiveArrayTypeDeclaration<T>() << " value)"
                               << "{ nativeSet(\"" << fieldName << "\", value); }";
 
             return setterDeclaration.str();

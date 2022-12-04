@@ -68,8 +68,8 @@ namespace jbind
 
           //  virtual void* getPointerToMember(JavaHandle* handle);
 
-            virtual std::string getGetter() = 0;
-            virtual std::string getSetter() = 0;
+            virtual std::string getGetterDeclaration() = 0;
+            virtual std::string getSetterDeclaration() = 0;
         
     };
 }

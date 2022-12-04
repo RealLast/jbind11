@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JavaPackage/JavaPackage.hpp"
+#include "JavaPackageInitializeFunctionInvoker.hpp"
 #include <vector>
 #include <memory.h>
 
@@ -10,13 +11,17 @@ namespace jbind
     {
         private:
             static std::vector<std::unique_ptr<JavaPackage>> javaPackages;
+            static std::vector<JavaPackageInitializeFunctionInvoker> initializeFunctionInvokers;
     
         public:
 
-            void static registerPackage(JavaPackage&& package)
+            void static registerPackage(JavaPackage&& package, JavaPackageInitializeFunctionInvoker&& initializeFunctionInvoker)
             {
                 std::unique_ptr<JavaPackage> uniquePackage = 
                     std::make_unique<JavaPackage>(std::move(package));
+
+                javaPackages.push_back(std::move(uniquePackage));
+                initializeFunctionInvokers.push_back(std::move(initializeFunctionInvoker));
             }
 
             template<typename JavaClass>
@@ -64,9 +69,33 @@ namespace jbind
                 return nullptr;
             }
 
-            const std::vector<std::unique_ptr<JavaPackage>>& getPackages() const
+            static const std::vector<std::unique_ptr<JavaPackage>>& getPackages() 
             {
                 return javaPackages;
+            }
+
+            static JavaPackage* getPackage(const std::string packageName)
+            {
+                for(std::unique_ptr<JavaPackage>& ptr : javaPackages)
+                {
+                    if(ptr->getPackageName() == packageName)
+                    {
+                        return ptr.get();
+                    }
+                }
+                return nullptr;
+            }
+
+            static void initializePackages()
+            {
+                printf("Initializing packages %d\n", javaPackages.size());
+                for(size_t i = 0; i < javaPackages.size(); i++)
+                {
+                    std::unique_ptr<JavaPackage>& packagePtr = javaPackages[i];
+                    JavaPackage& package = *packagePtr.get();
+                    JavaPackageInitializeFunctionInvoker& invoker = initializeFunctionInvokers[i];
+                    invoker.invoke(package);
+                }
             }
             
 
@@ -74,3 +103,4 @@ namespace jbind
 }
 
 std::vector<std::unique_ptr<jbind::JavaPackage>> jbind::JavaPackageManager::javaPackages;
+std::vector<jbind::JavaPackageInitializeFunctionInvoker> jbind::JavaPackageManager::initializeFunctionInvokers;

@@ -14,19 +14,19 @@
 
 
 // defines a static function (jbindInit*) and two static objects:
-// First, the JavaPackage and second, the JavaPackageInitializer.
-// The JavaPackager initializer get's the JavaPackage and the init function as paramter.
+// First, the JavaPackage and second, the JavaPackageRegistrar.
+// The JavaPackagerJavaPackageRegistrar get's the JavaPackage and the init function as paramter.
 // E.g., for JBIND_PACKAGE(MyPackage, p), it expands to:
 /*
 
     static void jbindInitMyPackage(jbind::JavaPackage& p); // DECLARATION of init function, so we can pass it to the packageInitializer before defining it
-    extern "C" JBIND_EXPORT jbind::JavaPackage jbindMyPackage("MyPackage");
-    extern "C" JBIND_EXPORT jbind::JavaPackageInitializer jbindJavaPackageInitializerMyPackage(jbindMyPackage, &jbindInitMyPackage);
+    extern "C" JBIND_EXPORT jbind::JavaPackage* jbindMyPackage = new jbind::JavaPackage("MyPackage");
+    extern "C" JBIND_EXPORT jbind::JavaPackageRegistrar jbindJavaPackageRegistrarMyPackage(&jbindMyPackage, &jbindInitMyPackage);
     static void jbindInitMyPackage(JavaPackage& p)
     // FUNCTION DEFINITION GOES HERE
 */
 #define JBIND_PACKAGE(packageName, packageVariable) \
     static void JBIND_CONCATENATE(jbindInit, packageName)(jbind::JavaPackage& packageVariable);\
-    extern "C" JBIND_EXPORT jbind::JavaPackage JBIND_CONCATENATE(jbind, packageName)(JBIND_TO_STRING(packageName));\
-    extern "C" JBIND_EXPORT jbind::JavaPackageInitializer JBIND_CONCATENATE(jbindJavaPackageInitializer, packageName)(JBIND_CONCATENATE(jbind, packageName), &JBIND_CONCATENATE(jbindInit, packageName));\
+    extern "C" JBIND_EXPORT jbind::JavaPackage* JBIND_CONCATENATE(jbind, packageName) = new jbind::JavaPackage(JBIND_TO_STRING(packageName));\
+    extern "C" JBIND_EXPORT jbind::JavaPackageRegistrar JBIND_CONCATENATE(jbindJavaPackageRegistrar, packageName)(JBIND_CONCATENATE(jbind, packageName), &JBIND_CONCATENATE(jbindInit, packageName));\
     static void JBIND_CONCATENATE(jbindInit, packageName)(jbind::JavaPackage& packageVariable)

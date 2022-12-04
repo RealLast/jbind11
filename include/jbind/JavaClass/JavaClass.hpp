@@ -161,10 +161,16 @@ namespace jbind
                 return this->packageHandle->getPackageName() + std::string(".") + this->className;
             }
 
-            virtual const std::map<std::string, std::shared_ptr<AbstractJavaField>>& getFields() const
+            virtual std::vector<std::string> getFieldNames()
             {
-                return this->javaFields;
+                std::vector<std::string> fieldNames;
+                for(const auto& entry : this->javaFields)
+                {
+                    fieldNames.push_back(entry.first);
+                }
+                return fieldNames;
             }
+
 
 
     };

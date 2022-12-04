@@ -54,12 +54,12 @@ namespace jbind
                 return this->fieldName;
             }
 
-            virtual std::string getGetter()
+            virtual std::string getGetterDeclaration()
             {
                 return GetterGenerator<T>::generate(this->fieldName);
             }
 
-            virtual std::string getSetter()
+            virtual std::string getSetterDeclaration()
             {
                 return SetterGenerator<T>::generate(this->fieldName);
             }

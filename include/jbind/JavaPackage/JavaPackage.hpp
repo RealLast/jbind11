@@ -87,6 +87,17 @@ namespace jbind
                 return this->packageName;
             }
 
+            std::vector<std::string> getClassNames() const
+            {
+                std::vector<std::string> classNames;
+                for(const auto& entry : this->javaClasses)
+                {
+                    classNames.push_back(entry.first);
+                }
+
+                return classNames;
+            }
+
          
     };
 }

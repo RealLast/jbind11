@@ -17,7 +17,7 @@ namespace jbind
         static std::string generate(const std::string& fieldName)
         {
             std::stringstream setterDeclaration;
-            setterDeclaration << "public void " << "set_" << fieldName << "(" << Caster<T>::canonicalTypeName() << " value)"
+            setterDeclaration << "public void " << "set_" << fieldName << " (" << Caster<T>::canonicalTypeName() << " value)"
                               << "{ nativeSet(\"" << fieldName << "\", value); }";
 
             return setterDeclaration.str();
@@ -30,8 +30,8 @@ namespace jbind
         static std::string generate(const std::string& fieldName)
         {
             std::stringstream getterDeclaration;
-            getterDeclaration << "public " << Caster<T>::canonicalTypeName() << "get_" << fieldName << "()"
-                              << "{ return nativeGet(\"" << fieldName << "\"); }";
+            getterDeclaration << "public " << Caster<T>::canonicalTypeName() << " get_" << fieldName << "()"
+                              << "{ return (" << Caster<T>::canonicalTypeName() << ") nativeGet(\"" << fieldName << "\"); }";
 
             return getterDeclaration.str();
         }
