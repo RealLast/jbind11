@@ -10,7 +10,10 @@
 #include "JavaPackage/JavaPackageHandle.hpp"
 #include "TypeName.hpp"
 #include "jbind_throw.hpp"
+
 #include "JavaField/JavaField.hpp"
+
+#include "JavaHandle/JavaHandle.hpp"
 
 namespace jbind
 {
@@ -20,6 +23,8 @@ namespace jbind
         public:
             std::map<std::string, std::shared_ptr<AbstractJavaField>> javaFields;
             static std::string staticClassName;
+            static std::string staticPackageName;
+
             std::string className;
 
             bool ownedByPackage = false;
@@ -33,6 +38,25 @@ namespace jbind
                 {
                     JBIND_THROW("Error, a wrapper for the native C++ class \"" << TypeName<T>::get() << " was created multiple times.\n"
                     << "Once under the name \"" << JavaClass<T>::staticClassName << "\" and another time under the name \"" << this->className << "\"");
+                }
+                JavaClass<T>::staticClassName = this->className;
+
+                registerPackageName();
+            }
+
+            void registerPackageName()
+            {
+                if(this->packageHandle == nullptr)
+                {
+                    JBIND_THROW("Error, cannot register JavaClass to a package. A package handle was not provided."
+                    << "Make sure to follow jbind's standard approach for creating JavaClass.");
+                }
+
+                // Globally set the package name of this class.
+                if(JavaClass<T>::staticPackageName != this->packageHandle->getPackageName() && JavaClass<T>::staticPackageName != "")
+                {
+                    JBIND_THROW("Error, wrapper for the native C++ class \"" << TypeName<T>::get() << " was added to multiple different packages."
+                    << "Once to package \"" << JavaClass<T>::staticPackageName << "\" and once under \"" << this->packageHandle->getPackageName() << "\".");
                 }
                 JavaClass<T>::staticClassName = this->className;
             }
@@ -67,12 +91,6 @@ namespace jbind
                 this->ownedByPackage = false;
             }
 
-            template<typename Function>
-            JavaClass& def(const char* name, Function&& f)
-            {
-
-            }
-
             bool hasField(const std::string& fieldName)
             {
                 auto it = this->javaFields.find(fieldName);
@@ -85,12 +103,21 @@ namespace jbind
 
                 if(it == this->javaFields.end())
                 {
-                    JBIND_THROW("Error, cannot get field \"" << fieldName << "\" from JavaClass \"" << this->className << "\". Field was not registered");
+                    JBIND_THROW("Error, cannot get field \"" << fieldName << "\" from JavaClass \"" << this->className << "\". Field was not registered.");
                 }
 
-                return it.second.get();
+                return it->second.get();
             }
 
+            jbind::JavaHandle* spawnNewObject() const
+            {
+                T* t = new T();
+                JavaHandle* handle = new JavaHandle();
+                handle->set(t);
+                return handle;
+            }
+
+           
             // E.g.:
             /* 
                 class MyClass
@@ -111,6 +138,12 @@ namespace jbind
                 return *this;
             }
 
+            template<typename Function>
+            JavaClass& def(const char* name, Function&& f)
+            {
+
+            }
+
             void print()
             {
                 for(auto entry : javaFields)
@@ -119,10 +152,21 @@ namespace jbind
                 }
             }
 
-            virtual const std::string& getClassName() const
+            virtual const std::string& getJavaClassName() const
             {
                 return this->className;
             }
+
+            virtual const std::string getCanonicalName() const
+            {
+                if(this->packageHandle == nullptr)
+                {
+                    JBIND_THROW("Error, cannot get canonical name from JavaClass. The class was never assigned to a package.\n"
+                    << "Make sure to follow jbind's standard approach for creating JavaClass.");
+                }
+                return this->packageHandle->getPackageName() + std::string(".") + this->className;
+            }
+
     };
 }
 
@@ -161,3 +205,8 @@ namespace jbind
 
 template<typename T>
 std::string jbind::JavaClass<T>::staticClassName = "";
+
+template<typename T>
+std::string jbind::JavaClass<T>::staticPackageName = "";
+
+

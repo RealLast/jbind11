@@ -16,7 +16,7 @@ namespace jbind
 {
     // Wrapper around a plain C++ object.
     // Stores the raw pointer to the object as well as it's associated java class.
-    class JavaHandle
+    class JavaHandle 
     {
         private:
             void* rawPtr;
@@ -37,7 +37,7 @@ namespace jbind
         public:
             
             template<typename T>
-            void set(T& value)
+            void set(T* value)
             {
                 this->rawPtr = static_cast<void*>(&value);
                 this->javaClass = JavaPackageManager::findClass<JavaClass<T>>();
@@ -51,13 +51,13 @@ namespace jbind
             }
 
             template<typename T>
-            T& get()
+            T* get()
             {
                 if(!this->initialized)
                 {
                     JBIND_THROW("Failed to get object reference from JavaHandle. Handle has not been initialized using set() before!");
                 }
-                return *static_cast<T*>(this->rawPtr);    
+                return static_cast<T*>(this->rawPtr);    
             }
 
             AbstractJavaClass* getJavaClass()
@@ -82,7 +82,7 @@ namespace jbind
                 if(handleField == nullptr)
                 {
                     std::string className = JNIUtils::getNameOfClassOfObject(env, javaObject);
-                    JBIND_THROW("Error, cannot get handle from object of class \"" << className << "\".\n"
+                    JBIND_THROW("Error, cannot get JavaHandle from object of class \"" << className << "\".\n"
                     << "Class \"" << className << "\" does not have a field called \"nativeJavaHandle\"\n."
                     << "Apparently, this class is not a wrapped class, i.e., it does not inherit from JBindWrapper.");
                 }
@@ -91,7 +91,7 @@ namespace jbind
                 return reinterpret_cast<JavaHandle*>(handle);
             }
 
-            static void assignHandleToObject(JNIEnv* env, jobject javaObject, JavaHandle* javaHandle)
+            void assignHandleToObject(JNIEnv* env, jobject javaObject)
             {
                 jfieldID handleField = getHandleField(env, javaObject);
 
@@ -103,7 +103,7 @@ namespace jbind
                     << "Apparently, this class is not a wrapped class, i.e., it does not inherit from JBindWrapper.");
                 }
 
-                jlong handle = reinterpret_cast<jlong>(javaHandle);
+                jlong handle = reinterpret_cast<jlong>(this);
                 env->SetLongField(javaObject, handleField, handle);
             }
 

@@ -9,5 +9,6 @@ namespace jbind
     {
         public:
             virtual void transferOwnershipOfClassToPackage(AbstractJavaClass* abstractClass, bool& ownerShipVariable) = 0;
+            virtual const std::string& getPackageName() const = 0;
     };
 }

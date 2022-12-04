@@ -25,5 +25,10 @@ namespace jbind
                 JavaClass* javaClass = static_cast<JavaClass*>(abstractClass);
                 package->template registerClass<JavaClass>(std::move(*javaClass));
             }
+
+            const std::string& getPackageName() const
+            {
+                return package->getPackageName();
+            }
     };
 }

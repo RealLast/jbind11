@@ -7,7 +7,7 @@
 #include "cast.hpp"
 
 #include "jbind_macros.hpp"
-
+#include "JBindWrapper.hpp"
 
 extern "C" 
 {
@@ -15,7 +15,7 @@ extern "C"
     {
         printf("ONLOAD\n");
         jbind::ClassLoader::onLoad(pjvm);
-   // claid::JavaWrapper::JNIUtils::onLoad(pjvm);
-    return JNI_VERSION_1_6;
+    // claid::JavaWrapper::JNIUtils::onLoad(pjvm);
+        return JNI_VERSION_1_6;
     }
 }
