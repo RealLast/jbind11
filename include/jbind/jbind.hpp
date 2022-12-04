@@ -7,7 +7,7 @@
 #include "cast.hpp"
 
 #include "jbind_macros.hpp"
-#include "JBindWrapper.hpp"
+#include "JBindWrapper/JBindWrapper.hpp"
 
 extern "C" 
 {

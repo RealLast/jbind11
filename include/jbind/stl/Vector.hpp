@@ -8,6 +8,10 @@
 #include <vector>
 
 #include "JavaNativeClasses/JavaArrayList.hpp"
+#include "JNIUtils/JNIUtils.hpp"
+
+
+#include "JBindWrapper/GetterSetterGenerator.hpp"
 
 namespace jbind
 {
@@ -108,7 +112,48 @@ namespace jbind
                 }
 
                 return arrayList.getJavaObject();
-             }
+            }
+
+            static std::string canonicalTypeName()
+            {
+                return "java.util.ArrayList<" + Caster<Value>::canonicalTypeName() + ">";
+            }
+    };
+
+    // Template specialization for SetterGenerator, since we accept either ArrayList<T> or T[] as input, if T is primitive.
+    // Might think about adding support for List<T> and Vector<T>
+    template<class T>
+    struct SetterGenerator<T, typename std::enable_if<is_specialization_of<T, std::vector>::value && std::is_arithmetic<typename T::Value>::value>::type>
+    {
+        typedef typename T::value_type Value;
+        static std::string generateForArrayList(const std::string& fieldName)
+        {
+            std::stringstream setterDeclaration;
+            setterDeclaration << "public void " << "set_" << fieldName << "(" << Caster<T>::canonicalTypeName() << " value)"
+                              << "{ nativeSet(\"" << fieldName << "\", value); }";
+
+            return setterDeclaration.str();
+        }
+
+        static std::string generateForPrimitiveArray(const std::string& fieldName)
+        {
+    
+
+            std::stringstream setterDeclaration;
+            setterDeclaration << "public void " << "set_" << fieldName << "(" << JNIUtils::getPrimitiveArrayTypeDeclaration<T>() << " value)"
+                              << "{ nativeSet(\"" << fieldName << "\", value); }";
+
+            return setterDeclaration.str();
+        }
+
+        static std::string generate(const std::string& fieldName)
+        {
+            std::stringstream setterDeclaration;
+            setterDeclaration << generateForArrayList(fieldName) << "\n"
+                              << generateForPrimitiveArray(fieldName);
+
+            return setterDeclaration.str();
+        }
     };
 
 }   

@@ -11,7 +11,7 @@
 namespace jbind
 {
     template<class T>
-    struct Caster<T, typename std::enable_if<is_same<T, std::string>::value>::type> 
+    struct Caster<T, typename std::enable_if<std::is_same<T, std::string>::value>::type> 
     {        
         public:
 
@@ -23,6 +23,11 @@ namespace jbind
             static jobject cast(JNIEnv* env, std::string& string)
             {
                 return JNIUtils::toJString(env, string);
+            }
+
+            static std::string canonicalTypeName()
+            {
+                return "java.lang.String";
             }
     };
 

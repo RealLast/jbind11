@@ -63,6 +63,11 @@ namespace jbind
 
                 return nullptr;
             }
+
+            const std::vector<std::unique_ptr<JavaPackage>>& getPackages() const
+            {
+                return javaPackages;
+            }
             
 
     };

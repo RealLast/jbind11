@@ -87,14 +87,7 @@ namespace jbind
                 return this->packageName;
             }
 
-            void print()
-            {
-                printf("Printing package %s %lu\n", packageName.c_str(), this->javaClasses.size());
-                for(auto& entry : javaClasses)
-                {
-                    entry.second->print();
-                }
-            }
+         
     };
 }
 

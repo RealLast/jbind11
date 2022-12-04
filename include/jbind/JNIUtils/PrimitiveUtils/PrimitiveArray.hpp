@@ -51,7 +51,7 @@ namespace jbind
         // Note that Java's Character class is 16 bit. 
         // Further note: char16_t can neither be signed nor unsigned.
         template<typename T>
-        static inline typename std::enable_if<std::is_same<T, char16_t>::value, std::string>::type
+        static inline typename std::enable_if<std::is_same<T, char16_t>::value>::type
         getPrimitiveArrayRegion(JNIEnv* env, jarray object, size_t start, size_t length, T* destination)
         {
             env->GetCharArrayRegion(static_cast<jcharArray>(object), start, length, destination);

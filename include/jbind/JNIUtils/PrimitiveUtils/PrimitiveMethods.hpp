@@ -10,10 +10,7 @@ namespace jbind
         static inline typename std::enable_if<std::is_same<T, int8_t>::value || std::is_same<T, uint8_t>::value, T>::type
         callPrimitiveMethod(JNIEnv* env, jobject& object, jmethodID methodID)
         {
-
-            jbyte jByte = env->CallByteMethod(object, methodID);
-        
-            return jByte;
+            return env->CallByteMethod(object, methodID);;
         }
 
         template<typename T>

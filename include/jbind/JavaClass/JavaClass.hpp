@@ -144,13 +144,7 @@ namespace jbind
 
             }
 
-            void print()
-            {
-                for(auto entry : javaFields)
-                {
-                    printf("%s\n", entry.second->getFieldDeclaration().c_str());
-                }
-            }
+           
 
             virtual const std::string& getJavaClassName() const
             {
@@ -166,6 +160,12 @@ namespace jbind
                 }
                 return this->packageHandle->getPackageName() + std::string(".") + this->className;
             }
+
+            virtual const std::map<std::string, std::shared_ptr<AbstractJavaField>>& getFields() const
+            {
+                return this->javaFields;
+            }
+
 
     };
 }

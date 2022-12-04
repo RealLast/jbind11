@@ -38,7 +38,7 @@ namespace jbind
     class AbstractJavaField
     {  
         protected:
-            std::string name;
+            std::string fieldName;
 
         public:
             
@@ -47,7 +47,7 @@ namespace jbind
                 
             }
 
-            AbstractJavaField(const std::string& name) : name(name)
+            AbstractJavaField(const std::string& fieldName) : fieldName(fieldName)
             {
 
             }
@@ -68,7 +68,6 @@ namespace jbind
 
           //  virtual void* getPointerToMember(JavaHandle* handle);
 
-            virtual std::string getFieldDeclaration() = 0;
             virtual std::string getGetter() = 0;
             virtual std::string getSetter() = 0;
         

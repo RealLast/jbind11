@@ -1,6 +1,9 @@
 #pragma once
 #include "jbind/cast.hpp"
 #include "JavaHandle/JavaHandle.hpp"
+
+#include "JBindWrapper/GetterSetterGenerator.hpp"
+
 namespace jbind
 {
     template<typename Class, typename T, class Enable = void>
@@ -15,7 +18,7 @@ namespace jbind
 
             }
 
-            JavaField(const std::string& name, T Class::*ptr) : AbstractJavaField(name), ptr(ptr)
+            JavaField(const std::string& fieldName, T Class::*ptr) : AbstractJavaField(fieldName), ptr(ptr)
             {
 
             }
@@ -48,17 +51,17 @@ namespace jbind
 
             virtual std::string getFieldDeclaration()
             {
-                return this->name;
+                return this->fieldName;
             }
 
             virtual std::string getGetter()
             {
-                return "";
+                return GetterGenerator<T>::generate(this->fieldName);
             }
 
             virtual std::string getSetter()
             {
-                return "";
+                return SetterGenerator<T>::generate(this->fieldName);
             }
 
 

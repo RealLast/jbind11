@@ -70,5 +70,18 @@ namespace jbind
                 jobject object = JNIUtils::createObjectFromClassName(env, javaClassCanonicalName, "L", handleAddress);
                 return object;
             }
+
+            static std::string canonicalTypeName()
+            {
+                AbstractJavaClass* javaClass = JavaPackageManager::findClass<JavaClass<T>>();
+
+                if(javaClass == nullptr)
+                {
+                    JBIND_THROW("Failed to get canonical type name of JBindWrapper for native C++ class \"" << TypeName<T>::get() << "\". No wrapper was registered for this native type.\n"
+                    << "Make sure to add a wrapper for this class in an appropriate JBIND_MODULE declaration.");
+                }
+
+                return javaClass->getCanonicalName();
+            }
     };
 }
