@@ -3,6 +3,8 @@
 #include "JavaPackage/JavaPackage.hpp"
 #include "JavaPackage/JavaPackageManager.hpp"
 
+#include "JBindWrapper/JavaClassFile.hpp"
+
 #include <sstream>
 
 namespace jbind
@@ -10,7 +12,7 @@ namespace jbind
     class JBindWrapperGenerator
     {
         public:
-            void generateWrapperForClass(AbstractJavaClass* javaClass, const std::string& packageName, std::string& result)
+            void generateWrapperForClass(AbstractJavaClass* javaClass, const std::string& packageName, JavaClassFile& classFile)
             {
                 std::stringstream content;
 
@@ -36,12 +38,13 @@ namespace jbind
                 content << "}";
            
                 result = content.str();
+
+                classFile = JavaClassFile(javaClass->getJavaClassName(), content);
             }
 
-            void generateWrappersForPackage(JavaPackage* package, std::map<std::string, std::string>& result)
+            void generateWrappersForPackage(JavaPackage* package, std::vector<JavaClassFile>& javaClassFiles)
             {
-                // result will contain names of java classes and corresponding generated code.
-                result.clear();
+                javaClassFiles.clear();
 
                 const std::string& packageName = package->getPackageName();
 
@@ -50,25 +53,31 @@ namespace jbind
                 {  
                     const std::string& className = classNames[i];
                     AbstractJavaClass* javaClass = package->getClass(className);
-                    std::string contentForClass;
+                    JavaClassFile javaClassFile;
 
-                    generateWrapperForClass(javaClass, packageName, contentForClass);
-                    result.insert(make_pair(className, contentForClass));
+                    generateWrapperForClass(javaClass, packageName, javaClassFile);
+                    javaClassFiles.push_back(std::move(javaClassFile));
                 }
             };
 
-            void generateJBindWrapperBaseClassDefinition(std::string& content)
+            JavaClassFile generateJBindWrapperBaseClassDefinition()
             {
+
+                const std::string PACKAGE_NAME = "JBind";
+                const std::string CLASS_NAME = "JBindWrapper";
+
                 std::stringstream content;
 
                 content  <<
-                    "package JBind;"                                                                << "\n" <<
-                    "public class JBindWrapper"                                                     << "\n" <<
+                    "package " << PACKAGE_NAME << ";"                                               << "\n" <<
+                    "public class " << CLASS_NAME << ""                                             << "\n" <<
                     "{"                                                                             << "\n" <<
                     "\tprivate long nativeJavaHandle;"                                              << "\n" <<
                     "\tprivate native Object nativeGet(String fieldName);"                          << "\n" <<
                     "\tprivate native void nativeSet(String fieldName, Object value);"              << "\n" <<
                     "}";
+                
+                return JavaClassFile(CLASS_NAME, content);
             }
     };
 }
