@@ -18,7 +18,7 @@ namespace jbind
 
             }
 
-            JavaClassFile(const std::string& className, const std::string& content)
+            JavaClassFile(const std::string& className, const std::string& content) : className(className), content(content)
             {
 
             }
@@ -45,6 +45,7 @@ namespace jbind
             
             bool writeToFile(const std::string& path)
             {
+                printf("Writing java file %s\n", path.c_str());
                 std::ofstream file(path);
 
                 if(!file.is_open())

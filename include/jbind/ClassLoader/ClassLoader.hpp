@@ -32,12 +32,12 @@ namespace jbind
                     (Quote from comments below the stackoverflow answer).
 
                 */
-                std::string className = "JavaCLAID/Channel";
+                std::string className = "JBind/JBindWrapper";
                 auto randomClass = env->FindClass(className.c_str());
 
                 if(randomClass == nullptr)
                 {
-                    CLAID_THROW(claid::Exception, "Error in jbind::ClassLoader::onLoad. Cannot find class \"" << className << "\" therefore cannot retrieve ClassLoader.")
+                    JBIND_THROW("Error in jbind::ClassLoader::onLoad. Cannot find class \"" << className << "\" therefore cannot retrieve ClassLoader.")
                 }
 
                 jclass classClass = env->GetObjectClass(randomClass);

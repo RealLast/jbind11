@@ -3,6 +3,8 @@
 #include "JavaClass/AbstractJavaClass.hpp"
 #include <vector>
 #include <memory.h>
+#include <map>
+
 #include "jbind_throw.hpp"
 namespace jbind
 {

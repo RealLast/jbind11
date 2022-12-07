@@ -70,6 +70,7 @@ namespace jbind
 
             ~JavaClass()
             {
+                printf("JVC destru\n");
                 if(ownedByPackage)
                 {
                     return;

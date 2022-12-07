@@ -29,15 +29,6 @@ extern "C"
         {
             JBIND_THROW("Error package not found");
         }
-                JBindWrapperGenerator wrapperGenerator;
-
-        std::map<std::string, std::string> result;
-        wrapperGenerator.generateWrappersForPackage(package, result);
-
-        for(auto entry : result)
-        {
-            printf("%s\n", entry.second.c_str());
-        }
 
         return JNI_VERSION_1_6;
     }

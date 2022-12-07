@@ -17,12 +17,12 @@ namespace jbind
                 std::stringstream content;
 
                 content  <<
-                    "package " << packageName << ";"                                                << "\n" <<
-                    "public class " << javaClass->getJavaClassName() << " extends JBindWrapper"     << "\n" <<
-                    "{"                                                                             << "\n" <<
-                    "\tprivate long nativeJavaHandle;"                                              << "\n" <<
-                    "\tprivate native Object nativeGet(String fieldName);"                          << "\n" <<
-                    "\tprivate native void nativeSet(String fieldName, Object value);"              << "\n\n";
+                    "package " << packageName << ";"                                                        << "\n" <<
+                    "public class " << javaClass->getJavaClassName() << " extends JBind.JBindWrapper"       << "\n" <<
+                    "{"                                                                                     << "\n" <<
+                    "\tprivate long nativeJavaHandle;"                                                      << "\n" <<
+                    "\tprivate native Object nativeGet(String fieldName);"                                  << "\n" <<
+                    "\tprivate native void nativeSet(String fieldName, Object value);"                      << "\n\n";
 
 
                 std::vector<std::string> fieldNames = javaClass->getFieldNames();
@@ -37,9 +37,8 @@ namespace jbind
 
                 content << "}";
            
-                result = content.str();
 
-                classFile = JavaClassFile(javaClass->getJavaClassName(), content);
+                classFile = JavaClassFile(javaClass->getJavaClassName(), content.str());
             }
 
             void generateWrappersForPackage(JavaPackage* package, std::vector<JavaClassFile>& javaClassFiles)
@@ -60,10 +59,9 @@ namespace jbind
                 }
             };
 
-            JavaClassFile generateJBindWrapperBaseClassDefinition()
+            JavaClassFile generateJBindWrapperBaseClassDefinition(const std::string& folderName)
             {
-
-                const std::string PACKAGE_NAME = "JBind";
+                const std::string PACKAGE_NAME = folderName + std::string("JBind");
                 const std::string CLASS_NAME = "JBindWrapper";
 
                 std::stringstream content;
@@ -77,7 +75,7 @@ namespace jbind
                     "\tprivate native void nativeSet(String fieldName, Object value);"              << "\n" <<
                     "}";
                 
-                return JavaClassFile(CLASS_NAME, content);
+                return JavaClassFile(CLASS_NAME, content.str());
             }
     };
 }

@@ -14,10 +14,15 @@
 #include <windows.h>
 #include <cstdio>
 #include <tchar.h>
+#include <fileapi.h>
 #else
 #include <dirent.h>
 #include <ftw.h>
 #include <cstdio>
+int directoryDeleterHelper(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+	return remove(fpath);
+}
 #endif
 
 
@@ -26,6 +31,8 @@ namespace jbind
 {
     class JBindFileUtils
     {
+        public:
+
         static bool createDirectory(const std::string& path)
         {
             // Platform dependent code
@@ -33,7 +40,7 @@ namespace jbind
             #ifdef _WIN32
             return CreateDirectory(path.c_str(), NULL);
             #else
-            return mkdir(path.c_str(), 0744) == -1;
+            return mkdir(path.c_str(), 0744) == 0;
             #endif
         }
 
@@ -59,33 +66,86 @@ namespace jbind
             return createDirectory(path);
         }
 
-        // basically rm -rf
-        static bool deleteDirectoryRecursively(const std::string& path)
-        {
-            struct dirent *ent;
-            DIR *dir = opendir(path.c_str());
-            if (dir != NULL) {
-                /* remove all the files and directories within directory */
-                while ((ent = readdir(dir)) != NULL) 
-                {
-                    int res = std::remove((path + ent->d_name).c_str());
-                    if(res != 0)
-                    {
-                        return false;
-                    }
-                }
-                closedir (dir);
-            } 
-            else 
+        #ifdef __WIN32
+
+            bool isDots(const char* str)
             {
-                /* could not open directory */
-                return false;
+                if (strcmp(str, ".") && strcmp(str, ".."))
+                {
+                    return false;
+                }
+                return true;
             }
 
-            // Delete directory itself
-            return std::remove(path.c_str()) == 0;
+            bool removeDirectoryRecursively(const std::string& path)
+            {
+                HANDLE hFind;  // file handle
+                WIN32_FIND_DATAA findFileData;
 
+                std::string dirPath = path + std::string("/*");
+
+                hFind = FindFirstFileA(dirPath.c_str(), &findFileData); // find the first file
+                if (hFind == INVALID_HANDLE_VALUE)
+                    return false;
+
+
+                bool bSearch = true;
+                while (bSearch)
+                {
+                    if (FindNextFileA(hFind, &findFileData))
+                    {
+                        if (isDots(findFileData.cFileName))
+                            continue;
+
+                        if ((findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+                        {
+                            std::string subDirPath = path + std::string("/") + std::string(findFileData.cFileName);
+                            // we have found a directory, recurse
+                            if (!removeDirectoryRecursively(subDirPath))
+                            {
+                                FindClose(hFind);
+                                return false; // directory couldn't be deleted
+                            }      
+                        }
+                        else
+                        {
+                            std::string filePath = path + std::string("/") + std::string(findFileData.cFileName);
+                            // It's a file, delete it.
+
+                            if (!DeleteFileA(filePath.c_str()))
+                            {  // delete the file
+                                FindClose(hFind);                   
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (GetLastError() == ERROR_NO_MORE_FILES) // no more files there
+                        {
+                            bSearch = false;
+                        }
+                        else
+                        {
+                            // some error occured, close the handle and return FALSE
+                            FindClose(hFind);
+                            return false;
+                        }
+
+                    }
+
+                }
+                FindClose(hFind);  // closing file handle
+                return RemoveDirectoryA(path.c_str()); // remove the empty directory
+            }
+        #else
+
+        // basically rm -rf
+        static bool removeDirectoryRecursively(const std::string& path)
+        {
+            return nftw(path.c_str(), directoryDeleterHelper, 64, FTW_DEPTH | FTW_PHYS) == 0;
         }
+        #endif
 
         static bool fileExists(const std::string& path)
         {

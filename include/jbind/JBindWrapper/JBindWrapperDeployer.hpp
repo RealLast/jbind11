@@ -8,33 +8,20 @@ namespace jbind
     class JBindWrapperDeployer
     {
         private:
-            bool createDirectory(const std::string& path)
-            {
-                return JBindFileUtils::createDirectory(path);
-            }
-
-            bool createDirectoryIfNotExists()
-            {
-                return JBindFileUtils::createDirectoryIfNotExists(path);
-            }
-
-            bool removeFileIfExists(const std::string& path)
-            {
-                JBindFileUtils::removeFileIfExists(path);
-            }
+           
 
             void writeClassFile(const std::string& basePath, JavaClassFile& javaClassFile)
             {
-                const std::string filePath = jbindWrapperClassPath + std::string("/") + classFile.getClassName() + std::string(".java");
+                const std::string filePath = basePath + std::string("/") + javaClassFile.getClassName() + std::string(".java");
 
                 // Returns false, if file exists and oculd not be removed.
 
-                if(!removeFileIfExists(filePath))
+                if(!JBindFileUtils::removeFileIfExists(filePath))
                 {
                     JBIND_THROW("Failed to deploy JBind wrappers. File \"" << filePath << "\" already exists and could not be removed.");
                 }
                 
-                if(!classFile.writeToFile(filePath))
+                if(!javaClassFile.writeToFile(filePath))
                 {
                     JBIND_THROW("Failed to deploy JBind wrappers. File \"" << filePath << "\" could not be created.");
                 }
@@ -44,32 +31,35 @@ namespace jbind
             {
                 std::string jbindWrapperClassPath = basePath + std::string("/") + std::string("JBind");
                 
-                if(!createDirectoryIfNotExists(jbindWrapperClassPath))
+                if(!JBindFileUtils::createDirectoryIfNotExists(jbindWrapperClassPath))
                 {
                     JBIND_THROW("Failed to deploy JBind wrappers. Cannot create directory \"" << jbindWrapperClassPath << "\"");
                 }
 
                 JavaClassFile classFile = wrapperGenerator.generateJBindWrapperBaseClassDefinition();
-                writeClassFile(basePath, classFile);
+                writeClassFile(jbindWrapperClassPath, classFile);
             }
 
             void writePackage(const std::string& basePath, JavaPackage& package, JBindWrapperGenerator& wrapperGenerator)
             {
                 const std::string packagePath = basePath + std::string("/") + package.getPackageName();
 
-                if(directoryExists(packagePath))
+                if(JBindFileUtils::directoryExists(packagePath))
                 {
-                    deleteDirectoryRecursively(packagePath);
+                    if(!JBindFileUtils::removeDirectoryRecursively(packagePath))
+                    {
+                        JBIND_THROW("Failed to deploy JBind wrappers. Cannot recursively delete directory \"" << packagePath << "\"");
+                    }
                 }
 
                 // Returns false, if directory does not exist and could not be created.
-                if(!createDirectory(packagePath))
+                if(!JBindFileUtils::createDirectory(packagePath))
                 {
                     JBIND_THROW("Failed to deploy JBind wrappers. Cannot create directory \"" << packagePath << "\"");
                 }
 
                 std::vector<std::string> classNames = package.getClassNames();
-
+                printf("Package class names %d\n", classNames.size());
                 for(const std::string& className : classNames)
                 {
                     if(!package.hasClass(className))
@@ -82,14 +72,15 @@ namespace jbind
 
                     JavaClassFile javaClassFile;
                     wrapperGenerator.generateWrapperForClass(javaClass, package.getPackageName(), javaClassFile);
+                    writeClassFile(packagePath, javaClassFile);
                 }    
             }
 
             void writeAllPackages(const std::string& basePath, JBindWrapperGenerator& wrapperGenerator)
             {
-                std::vector<std::unique_ptr<JavaPackage>>& packages = JavaPackageManager::getPackages();
+                const std::vector<std::unique_ptr<JavaPackage>>& packages = JavaPackageManager::getPackages();
 
-                for(std::unique_ptr<JavaPackage>& package : packages)
+                for(const std::unique_ptr<JavaPackage>& package : packages)
                 {
                     writePackage(basePath, *package.get(), wrapperGenerator);
                 }
@@ -104,10 +95,40 @@ namespace jbind
         public:
             void deployAllToDirectory(const std::string& basePath)
             {
-                // Returns false if directory does not exist but could not be created.
-                if(!createDirectoryIfNotExists(basePath))
+                if(JBindFileUtils::directoryExists(basePath))
                 {
-                    JBIND_THROW("Failed to deploy JBind wrappers. Cannot create directory \"" << path << "\"");
+                    // Remove the directory recursively..
+                    // This is necessary, because the user might have deleted some packages or classes
+                    // since the last time this directory was created.
+                    // But, it is also a bit dangerous. What if the user accidently specified a directory
+                    // that contains files he does not want to delete.
+                    // We display a warning for now..
+                    printf("Deploying wrappers to path %s\n", basePath.c_str());
+                    printf("!!CAUTION!! Directory %s is not empty. It will be fully removed, all contents contained inside will be lost!\n", basePath.c_str());
+
+                    while(true)
+                    {
+                        printf("Enter y to continue, n to abort.\n");
+                        char val = std::getchar();
+
+                        if(val == 'y')
+                        {
+                            break;
+                        }
+                        else if(val == 'n')
+                        {
+                            exit(0);
+                        }
+                    }
+                    printf("Removing directory %s\n", basePath.c_str());
+                    JBindFileUtils::removeDirectoryRecursively(basePath);
+                }
+                
+
+                // Returns false if directory does not exist but could not be created.
+                if(!JBindFileUtils::createDirectoryIfNotExists(basePath))
+                {
+                    JBIND_THROW("Failed to deploy JBind wrappers. Cannot create directory \"" << basePath << "\"");
                 }
 
                 JBindWrapperGenerator wrapperGenerator;
