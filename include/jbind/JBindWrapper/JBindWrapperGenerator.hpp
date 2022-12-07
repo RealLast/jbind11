@@ -37,7 +37,6 @@ namespace jbind
 
                 content << "}";
            
-
                 classFile = JavaClassFile(javaClass->getJavaClassName(), content.str());
             }
 
