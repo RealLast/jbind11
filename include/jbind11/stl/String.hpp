@@ -30,5 +30,5 @@ namespace jbind11
                 return "java.lang.String";
             }
     };
-
 }   
+

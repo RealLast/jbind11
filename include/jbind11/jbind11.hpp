@@ -11,6 +11,8 @@
 #include "JBindWrapper/JBindWrapperGenerator.hpp"
 #include "JavaPackage/JavaPackageManager.hpp"
 
+#include "attr.hpp"
+
 extern "C" 
 {
     JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *pjvm, void *reserved)

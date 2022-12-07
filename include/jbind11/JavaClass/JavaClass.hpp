@@ -12,6 +12,7 @@
 #include "jbind11_throw.hpp"
 
 #include "JavaField/JavaField.hpp"
+#include "JavaAttribute/JavaAttribute.hpp"
 
 #include "JavaHandle/JavaHandle.hpp"
 
@@ -22,6 +23,9 @@ namespace jbind11
     {   
         public:
             std::map<std::string, std::shared_ptr<AbstractJavaField>> javaFields;
+
+            // I.e., constant static variables.
+            std::map<std::string, std::shared_ptr<JavaAttribute>> javaAttributes;
             static std::string staticClassName;
             static std::string staticPackageName;
 
@@ -139,12 +143,19 @@ namespace jbind11
                 return *this;
             }
 
+            // Define a/access constant static variable
+            JavaAttribute& attr(const std::string& name)
+            {
+                std::shared_ptr<JavaAttribute> attribute(new JavaAttribute(name));
+                this->javaAttributes.insert(std::make_pair(name, attribute));
+                return *attribute.get();
+            }
+
             template<typename Function>
             JavaClass& def(const char* name, Function&& f)
             {
-
+                return *this;
             }
-
            
 
             virtual const std::string& getJavaClassName() const
