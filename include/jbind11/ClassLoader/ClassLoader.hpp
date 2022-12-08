@@ -9,16 +9,16 @@ namespace jbind11
         // See https://stackoverflow.com/questions/13263340/findclass-from-any-thread-in-android-jni/16302771#16302771
 
         private:
-            static JavaVM* jvm;
-            static jobject gClassLoader;
-            static jmethodID gFindClassMethod;
-            static bool onLoadCalled;
+            JavaVM* jvm;
+            jobject gClassLoader;
+            jmethodID gFindClassMethod;
+            bool onLoadCalled;
 
         public:
             // See https://stackoverflow.com/questions/13263340/findclass-from-any-thread-in-android-jni/16302771#16302771
-            static void onLoad(JavaVM* javaVM)
+            void onLoad(JavaVM* javaVM)
             {
-                ClassLoader::jvm = javaVM;
+                this->jvm = javaVM;
                 JNIEnv* env = getEnv();
 
                 // ONLY use NON-SYSTEM class!!
@@ -53,7 +53,7 @@ namespace jbind11
                 onLoadCalled = true;
             }
 
-            static jclass findClass(JNIEnv* env, const char* name) 
+            jclass findClass(JNIEnv* env, const char* name) 
             {
                 if(!onLoadCalled)
                 {
@@ -89,7 +89,7 @@ namespace jbind11
                 return cls;
             }
 
-            static JNIEnv* getEnv() 
+            JNIEnv* getEnv() 
             {
                 JNIEnv *env;
                 int status = jvm->GetEnv((void**)&env, JNI_VERSION_1_6);
@@ -107,9 +107,11 @@ namespace jbind11
             }
 
     };
+
+    inline ClassLoader& getClassLoader()
+    {
+        static ClassLoader* classLoader = new ClassLoader();
+        return *classLoader;
+    }
 }
 
-JavaVM* jbind11::ClassLoader::jvm;
-jobject jbind11::ClassLoader::gClassLoader;
-jmethodID jbind11::ClassLoader::gFindClassMethod;
-bool jbind11::ClassLoader::onLoadCalled;

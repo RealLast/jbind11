@@ -6,7 +6,7 @@ namespace jbind11
 {
     namespace JNIUtils
     {
-        jfieldID getFieldOfClassOfObject(JNIEnv* env, jobject javaObject, const std::string& fieldName, const std::string& signature)
+        static jfieldID getFieldOfClassOfObject(JNIEnv* env, jobject javaObject, const std::string& fieldName, const std::string& signature)
         {
             jclass cls = JNIUtils::getClassOfObject(env, javaObject); 
             jfieldID fieldID = env->GetFieldID(cls, fieldName.c_str(), signature.c_str());
@@ -15,7 +15,7 @@ namespace jbind11
             return fieldID;
         }
 
-        bool hasClassOfObjectField(JNIEnv* env, jobject javaObject, const std::string& fieldName, const std::string& signature)
+        static bool hasClassOfObjectField(JNIEnv* env, jobject javaObject, const std::string& fieldName, const std::string& signature)
         {
             return getFieldOfClassOfObject(env, javaObject, fieldName, signature) != nullptr;
         }

@@ -78,7 +78,7 @@ namespace jbind11
 
             void writeAllPackages(const std::string& basePath, JBindWrapperGenerator& wrapperGenerator)
             {
-                const std::vector<std::unique_ptr<JavaPackage>>& packages = JavaPackageManager::getPackages();
+                const std::vector<std::unique_ptr<JavaPackage>>& packages = getPackageManager().getPackages();
 
                 for(const std::unique_ptr<JavaPackage>& package : packages)
                 {

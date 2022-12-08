@@ -10,12 +10,12 @@ namespace jbind11
     class JavaPackageManager
     {
         private:
-            static std::vector<std::unique_ptr<JavaPackage>> javaPackages;
-            static std::vector<JavaPackageInitializeFunctionInvoker> initializeFunctionInvokers;
+            std::vector<std::unique_ptr<JavaPackage>> javaPackages;
+            std::vector<JavaPackageInitializeFunctionInvoker> initializeFunctionInvokers;
     
         public:
 
-            void static registerPackage(JavaPackage&& package, JavaPackageInitializeFunctionInvoker&& initializeFunctionInvoker)
+            void registerPackage(JavaPackage&& package, JavaPackageInitializeFunctionInvoker&& initializeFunctionInvoker)
             {
                 std::unique_ptr<JavaPackage> uniquePackage = 
                     std::make_unique<JavaPackage>(std::move(package));
@@ -25,7 +25,7 @@ namespace jbind11
             }
 
             template<typename JavaClass>
-            static AbstractJavaClass* findClass()
+            AbstractJavaClass* findClass()
             {
                 // Get the instance of the class that was registered to the package.
                 std::string className = JavaClass::staticClassName;
@@ -48,7 +48,7 @@ namespace jbind11
             }
 
             // We assume canonical name is full name, i.e. packageName.className
-            static AbstractJavaClass* findClassByCanonicalName(const std::string& canonicalName)
+            AbstractJavaClass* findClassByCanonicalName(const std::string& canonicalName)
             {
                 for(std::unique_ptr<JavaPackage>& package : javaPackages)
                 {
@@ -69,12 +69,12 @@ namespace jbind11
                 return nullptr;
             }
 
-            static const std::vector<std::unique_ptr<JavaPackage>>& getPackages() 
+            const std::vector<std::unique_ptr<JavaPackage>>& getPackages() 
             {
                 return javaPackages;
             }
 
-            static JavaPackage* getPackage(const std::string packageName)
+            JavaPackage* getPackage(const std::string packageName)
             {
                 for(std::unique_ptr<JavaPackage>& ptr : javaPackages)
                 {
@@ -86,9 +86,8 @@ namespace jbind11
                 return nullptr;
             }
 
-            static void initializePackages()
+            void initializePackages()
             {
-                printf("Initializing packages %d\n", javaPackages.size());
                 for(size_t i = 0; i < javaPackages.size(); i++)
                 {
                     std::unique_ptr<JavaPackage>& packagePtr = javaPackages[i];
@@ -100,7 +99,10 @@ namespace jbind11
             
 
     };
-}
 
-std::vector<std::unique_ptr<jbind11::JavaPackage>> jbind11::JavaPackageManager::javaPackages;
-std::vector<jbind11::JavaPackageInitializeFunctionInvoker> jbind11::JavaPackageManager::initializeFunctionInvokers;
+    inline JavaPackageManager& getPackageManager()
+    {
+        static JavaPackageManager* packageManager = new JavaPackageManager();
+        return *packageManager;
+    }
+}

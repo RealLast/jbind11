@@ -10,7 +10,7 @@ namespace jbind11
         static jobject createObjectFromClassName(JNIEnv* env, std::string className, std::string constructorParameters, Parameters... parameters)
         {  
             stringReplaceAll(className, ".", "/");
-            jclass cls = ClassLoader::findClass(env, className.c_str());
+            jclass cls = getClassLoader().findClass(env, className.c_str());
 
             if(cls == nullptr)
             {

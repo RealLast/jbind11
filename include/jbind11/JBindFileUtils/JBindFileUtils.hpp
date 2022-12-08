@@ -19,7 +19,7 @@
 #include <dirent.h>
 #include <ftw.h>
 #include <cstdio>
-int directoryDeleterHelper(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+static int directoryDeleterHelper(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
 	return remove(fpath);
 }

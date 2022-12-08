@@ -14,7 +14,7 @@ namespace jbind11
         
             JavaPackageRegistrar(JavaPackage* package, void (*initializerFunction)(JavaPackage& package)) 
             {
-                JavaPackageManager::registerPackage(std::move(*package), JavaPackageInitializeFunctionInvoker(initializerFunction));
+                getPackageManager().registerPackage(std::move(*package), JavaPackageInitializeFunctionInvoker(initializerFunction));
             }
     };
 }

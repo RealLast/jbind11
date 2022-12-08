@@ -40,7 +40,7 @@ namespace jbind11
             void set(T* value)
             {
                 this->rawPtr = static_cast<void*>(&value);
-                this->javaClass = JavaPackageManager::findClass<JavaClass<T>>();
+                this->javaClass = getPackageManager().findClass<JavaClass<T>>();
 
                 if(this->javaClass == nullptr)
                 {
