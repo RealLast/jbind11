@@ -25,9 +25,9 @@ namespace jbind11
 
             // Exctracts the C++ instance from the handle, and uses the pointer to member to 
             // convert the member to a Java object.
-            virtual jobject getValue(JNIEnv* env, JavaHandle& javaHandle)
+            virtual jobject getValue(JNIEnv* env, JavaHandle javaHandle)
             {
-                Class* instance = javaHandle.get<Class>();
+                Class* instance = javaHandle.getNativeData<Class>();
                 return get(env, *instance);
             }
      
@@ -37,9 +37,9 @@ namespace jbind11
                 return Caster<T>::cast(env, value);
             }
 
-            virtual void setValue(JNIEnv* env, JavaHandle& javaHandle, jobject object)
+            virtual void setValue(JNIEnv* env, JavaHandle javaHandle, jobject object)
             {
-                Class* instance = javaHandle.get<Class>();
+                Class* instance = javaHandle.getNativeData<Class>();
                 set(env, *instance, object);
             }
 

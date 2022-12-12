@@ -18,7 +18,7 @@ namespace jbind11
 
                 content  <<
                     "package " << packageName << ";"                                                        << "\n" <<
-                    "public class " << javaClass->getJavaClassName() << " extends jbind11.JBindWrapper"       << "\n" <<
+                    "public class " << javaClass->getJavaClassName() << " extends jbind11.JBindWrapper"     << "\n" <<
                     "{"                                                                                     << "\n" <<
                     "\tprivate long nativeJavaHandle;"                                                      << "\n" <<
                     "\tprivate native Object nativeGet(String fieldName);"                                  << "\n" <<
@@ -72,6 +72,9 @@ namespace jbind11
                     "\tprivate long nativeJavaHandle;"                                              << "\n" <<
                     "\tprivate native Object nativeGet(String fieldName);"                          << "\n" <<
                     "\tprivate native void nativeSet(String fieldName, Object value);"              << "\n" <<
+                    "\tprivate native void nativeInit();"                                           << "\n" <<
+                    ""                                                                              << "\n" <<
+                    "public " << CLASS_NAME << "() { nativeInit(); }"                               << "\n" <<
                     "}";
                 
                 return JavaClassFile(CLASS_NAME, content.str());

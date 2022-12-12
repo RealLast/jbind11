@@ -17,7 +17,7 @@ namespace jbind11
     class Caster
     {
         public:
-            static T fromJavaObject(JNIEnv* env, jobject javaObject)
+            static T fromJavaObject(JNIEnv* env, jobject javaObject) 
             {
                 // Check if object has handle field.
                 // If yes, get handle from object and extract native object frm it.
@@ -29,25 +29,24 @@ namespace jbind11
                     << "The java object is neither a Wrapper (i.e., does not inherit from JBindWrapper) nor a supported native type (like vector, map, ...).");
                 }
 
-                JavaHandle* handle = 
+                JavaHandle handle = 
                     JavaHandle::getHandleFromObject(env, javaObject);                
                 
                 // This will create a copy of the variable.
                 // For now, we only support return by copy policy.
-                return *handle->get<T>();
+                return *handle.getNativeData<T>();
             }
 
-            static jobject cast(JNIEnv* env, T& value)
+            static jobject cast(JNIEnv* env, T& value) 
             {
                 // Check if a corresponding JavaClass was registered for type T.
                 // If yes, use the JavaClass to create the corresponding java object (wrapper).
-                // Copy T to a new instance on heap, store the pointer in a new JavaHandle and assign
-                // the java handle to the java wrapper object.
-                // The wrapper object takes ownership of the handle and data on the heap.
+                
+                // The java object takes ownership of the handle and data on the heap.
                 // A copy is necessary at this point, because in generall we do not know
                 // about the lifetime of value.
 
-                // TODO: If you want to cast objects without copy, pass it as shared_ptr or as rvalue reference.
+                // TODO: allow cast objects without copy, pass it as shared_ptr or as rvalue reference.
                 AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<T>>();
 
                 if(javaClass == nullptr)
@@ -58,17 +57,21 @@ namespace jbind11
                 // canonical name = package.classname
                 std::string javaClassCanonicalName = javaClass->getCanonicalName();
 
-                T* copy = new T(value);
-                JavaHandle* handle = new JavaHandle();
-                handle->set(copy);
 
 
-                intptr_t handleAddress = reinterpret_cast<intptr_t>(handle);
+                // This calls the constructor of the wrapper class.
+                // That constructor will call JBindWrapper_init().
+                jobject javaObject = JNIUtils::createObjectFromClassName(env, javaClassCanonicalName, "");
 
-                // This calls the private constructor of the wrapper class.
-                // Will throw exception on failure.
-                jobject object = JNIUtils::createObjectFromClassName(env, javaClassCanonicalName, "L", handleAddress);
-                return object;
+
+                // In JBindWrapper_init(), a JavaHandle was created and a new instance of T assigned to it.
+                // All that is left to do is to copy value into the data of the handle.
+                JavaHandle handle = 
+                    JavaHandle::getHandleFromObject(env, javaObject);   
+                T* handleObject = handle.getNativeData<T>();
+                *handleObject = value;
+
+                return javaObject;
             }
 
             static std::string canonicalTypeName()
@@ -85,3 +88,5 @@ namespace jbind11
             }
     };
 }
+
+

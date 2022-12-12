@@ -29,7 +29,7 @@ namespace jbind11
 
             if(object == nullptr)
             {
-                JBIND_THROW("Cannot create java object, object with class signature " << className << " could not be created.");
+                JBIND_THROW("Cannot create java object, object with class signature " << className << " was found, but could not be created.");
             }
 
             env->DeleteLocalRef(cls);

@@ -8,7 +8,6 @@ namespace jbind11
     {
         static JNIEnv* getEnv() 
         {
-            JBIND_THROW("Needs evaluation");
             return getClassLoader().getEnv();
         }
     }

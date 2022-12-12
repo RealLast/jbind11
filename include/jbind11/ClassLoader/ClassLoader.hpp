@@ -9,16 +9,17 @@ namespace jbind11
         // See https://stackoverflow.com/questions/13263340/findclass-from-any-thread-in-android-jni/16302771#16302771
 
         private:
-            JavaVM* jvm;
+            JavaVM* jvm = nullptr;
             jobject gClassLoader;
             jmethodID gFindClassMethod;
-            bool onLoadCalled;
+            bool onLoadCalled = false;
 
         public:
             // See https://stackoverflow.com/questions/13263340/findclass-from-any-thread-in-android-jni/16302771#16302771
             void onLoad(JavaVM* javaVM)
             {
                 this->jvm = javaVM;
+
                 JNIEnv* env = getEnv();
 
                 // ONLY use NON-SYSTEM class!!
@@ -32,9 +33,8 @@ namespace jbind11
                     (Quote from comments below the stackoverflow answer).
 
                 */
-                std::string className = "jbind11/JBindWrapper";
+                std::string className = "JBind/JBindWrapper";
                 auto randomClass = env->FindClass(className.c_str());
-
                 if(randomClass == nullptr)
                 {
                     JBIND_THROW("Error in jbind11::ClassLoader::onLoad. Cannot find class \"" << className << "\" therefore cannot retrieve ClassLoader.")
@@ -51,6 +51,7 @@ namespace jbind11
                 gFindClassMethod = env->GetMethodID(classLoaderClass, "findClass",
                                                 "(Ljava/lang/String;)Ljava/lang/Class;");
                 onLoadCalled = true;
+
             }
 
             jclass findClass(JNIEnv* env, const char* name) 
@@ -91,6 +92,13 @@ namespace jbind11
 
             JNIEnv* getEnv() 
             {
+                std::cout << std::flush;
+
+                if(jvm == nullptr)
+                {
+                    JBIND_THROW("Error, ClassLoader::getEnv() was called without prior call to onLoad. Please make sure that jbind11::ClassLoader::onLoad "
+                    << "was called in JNI_OnLoad in native code. To do so, please include \"jbind11/jbind11_main.hpp\" in your main source file.");
+                }
                 JNIEnv *env;
                 int status = jvm->GetEnv((void**)&env, JNI_VERSION_1_6);
                 if(status < 0) {    

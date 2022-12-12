@@ -1,28 +1,28 @@
 #pragma once
 
-#include "JavaClass/AbstractJavaClass.hpp"
-#include "JavaPackage/JavaPackageManager.hpp"
-#include "JNIUtils/JNIUtils.hpp"
+#include "JavaHandle/JavaHandleData.hpp"
 namespace jbind11
 {
-    template <typename T>
-    class JavaClass;
-}
+    // Wrapper around JavaHandleData to realize reference counting.
+    // Uses std::shared_ptr for the reference counting - I do not want to reinvent the wheel.
 
-#include "JavaClass/JavaClass.hpp"
+    // Manages an instance of a java class that was created using jbind11.
+    // Whenever an instance of a java class, that was created using jbind11, is constructed,
+    // a corresponding native C++ object will be created and stored in the handle (data), alongside with a reference
+    // to the java object (jobject).
 
-#include "jbind11_throw.hpp"
-namespace jbind11
-{
-    // Wrapper around a plain C++ object.
-    // Stores the raw pointer to the object as well as it's associated java class.
-    class JavaHandle 
+    // This handle is then assigned to the jobject.
+    // This is a bit different from pybind11, where the handle manages only *python* object.
+    // Here, the handle manages mostly *native C++* and stores a reference to the jobject.
+
+    // There should be only *ONE* JavaHandleData per object.
+    // If the java object get's deleted (finalize), the handle should be deleted aswell.
+    // If all references to a JavaHandle are destroyed, the JavaHandleData get's destructed and deletes the native C++ data.
+
+    class JavaHandle
     {
         private:
-            void* rawPtr;
-            AbstractJavaClass* javaClass;
-
-            bool initialized = false;
+            std::shared_ptr<JavaHandleData> handleData;
 
             static jfieldID getHandleField(JNIEnv* env, jobject obj)
             {
@@ -34,39 +34,55 @@ namespace jbind11
                 return fieldID;
             }
 
-        public:
-            
             template<typename T>
-            void set(T* value)
+            void setNativeData(T* value)
             {
-                this->rawPtr = static_cast<void*>(&value);
-                this->javaClass = getPackageManager().findClass<JavaClass<T>>();
-
-                if(this->javaClass == nullptr)
-                {
-                    JBIND_THROW("Failed to create JavaHandle for Native C++ class \"" << TypeName<T>::get() << "\". No JavaClass wrapper was registered for this native type.");
-                }
-
-                this->initialized = true;
+                this->handleData->setNativeData(value);
             }
 
-            template<typename T>
-            T* get()
+            bool handleValid = false;
+
+            JavaHandle(bool valid)
             {
-                if(!this->initialized)
-                {
-                    JBIND_THROW("Failed to get object reference from JavaHandle. Handle has not been initialized using set() before!");
-                }
-                return static_cast<T*>(this->rawPtr);    
+                this->handleValid = false;
+            }
+
+        public:
+
+            
+
+            JavaHandle()
+            {
+                this->handleData = constructNewHandleData<JavaHandleData>();
+            }
+
+            static JavaHandle invalidHandle()
+            {
+                return JavaHandle(false);
+            }
+
+            // Used to solve cyclic dependenciy with JavaHandleManager.
+            template<typename T>
+            std::shared_ptr<T> constructNewHandleData();
+
+            template<typename T>
+            void setNativeDataTakeOwnership(T* t)
+            {
+                this->handleData->setNativeData(t);
+                // handleData will delete t when
+                // it get's destructed.
+            }
+            
+            
+            template<typename T>
+            T* getNativeData()
+            {
+                return this->handleData->getNativeData<T>();   
             }
 
             AbstractJavaClass* getJavaClass()
             {
-                if(!this->initialized)
-                {
-                    JBIND_THROW("Failed to get JavaClass from JavaHandle. Handle has not been initialized using set() before!");
-                }
-                return this->javaClass;
+                return this->handleData->getJavaClass();
             }
 
             static bool hasObjectHandleField(JNIEnv* env, jobject javaObject)
@@ -75,7 +91,7 @@ namespace jbind11
                 return handleField != nullptr;
             }
 
-            static JavaHandle* getHandleFromObject(JNIEnv* env, jobject javaObject)
+            static JavaHandle getHandleFromObject(JNIEnv* env, jobject javaObject)
             {
                 jfieldID handleField = getHandleField(env, javaObject);
 
@@ -87,11 +103,16 @@ namespace jbind11
                     << "Apparently, this class is not a wrapped class, i.e., it does not inherit from JBindWrapper.");
                 }
 
-                jlong handle = env->GetLongField(javaObject, handleField);
-                return reinterpret_cast<JavaHandle*>(handle);
+                jlong handlePtr = env->GetLongField(javaObject, handleField);
+
+                // Make a copy of handle object stored in the jobject and return it.
+                // Increases the reference count of the JavaHandleData.
+                // If the jobject get's deleted meanwhile, the data pointed to is still valid.
+                JavaHandle reference = *reinterpret_cast<JavaHandle*>(handlePtr);
+                return reference;
             }
 
-            void assignHandleToObject(JNIEnv* env, jobject javaObject)
+            void assignToObject(JNIEnv* env, jobject javaObject)
             {
                 jfieldID handleField = getHandleField(env, javaObject);
 
@@ -103,9 +124,32 @@ namespace jbind11
                     << "Apparently, this class is not a wrapped class, i.e., it does not inherit from JBindWrapper.");
                 }
 
-                jlong handle = reinterpret_cast<jlong>(this);
-                env->SetLongField(javaObject, handleField, handle);
+                jlong handlePtr = reinterpret_cast<jlong>(this);
+                env->SetLongField(javaObject, handleField, handlePtr);
+
+                this->handleData->setJavaObjectReference(javaObject);
             }
 
+            jobject getJavaObjectReference()
+            {
+                return this->handleData->getJavaObjectReference();
+            }
+
+            bool isValid() const
+            {
+                return this->handleValid && this->handleData->isValid();
+            }
+            
+
     };
+}
+
+#include "JavaHandleManager.hpp"
+namespace jbind11
+{
+    template<typename T>
+    std::shared_ptr<T> JavaHandle::constructNewHandleData()
+    {
+        return std::make_shared<T>(static_cast<AbstractJavaHandleManager*>(&getHandles()));
+    }
 }

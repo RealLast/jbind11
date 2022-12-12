@@ -11,7 +11,7 @@ extern "C"
     {
         std::string canonicalClassName = JNIUtils::getNameOfClassOfObject(env, wrappedObject);
 
-        AbstractJavaClass* javaClass = JavaPackageManager::findClassByCanonicalName(canonicalClassName);
+        AbstractJavaClass* javaClass = getPackageManager().findClassByCanonicalName(canonicalClassName);
 
         if(javaClass == nullptr)
         {
@@ -23,8 +23,8 @@ extern "C"
             << "Please follow the official jbind11 guidelines.");
         }
 
-        JavaHandle* handle = javaClass->spawnNewObject();
-        handle->assignHandleToObject(env, wrappedObject);
+        JavaHandle* handle = javaClass->spawnNewHandle();
+        handle->assignToObject(env, wrappedObject);
     }
 
     JNIEXPORT void JNICALL JBind_JBindWrapper_set(JNIEnv* env, jobject wrappedObject, jstring jfieldName, jobject value)
@@ -32,11 +32,11 @@ extern "C"
         std::string fieldName = JNIUtils::toStdString(env, jfieldName);
         // Please note, that error handling is done appropriately by each of the individual functions
         // of JavaHandle, AbstractJavaClass and AbstractJavaField.
-        JavaHandle* handle = JavaHandle::getHandleFromObject(env, wrappedObject);
-        AbstractJavaClass* javaClass = handle->getJavaClass();
+        JavaHandle handle = JavaHandle::getHandleFromObject(env, wrappedObject);
+        AbstractJavaClass* javaClass = handle.getJavaClass();
         AbstractJavaField* field = javaClass->getField(fieldName);
 
-        field->setValue(env, *handle, value);
+        field->setValue(env, handle, value);
     }
 
     JNIEXPORT jobject JNICALL JBind_JBindWrapper_get(JNIEnv* env, jobject wrappedObject, jstring jfieldName)
@@ -44,10 +44,10 @@ extern "C"
         std::string fieldName = JNIUtils::toStdString(env, jfieldName);
         // Please note, that error handling is done appropriately by each of the individual functions
         // of JavaHandle, AbstractJavaClass and AbstractJavaField.
-        JavaHandle* handle = JavaHandle::getHandleFromObject(env, wrappedObject);
-        AbstractJavaClass* javaClass = handle->getJavaClass();
+        JavaHandle handle = JavaHandle::getHandleFromObject(env, wrappedObject);
+        AbstractJavaClass* javaClass = handle.getJavaClass();
         AbstractJavaField* field = javaClass->getField(fieldName);
 
-        return field->getValue(env, *handle);
+        return field->getValue(env, handle);
     }
 }

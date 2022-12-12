@@ -7,6 +7,6 @@ namespace jbind11
     class AbstractJavaAttributeValue
     {
         public:
-            virtual jobject getJavaObject() const = 0;
+            virtual jobject getJavaObject() = 0;
     };
 }

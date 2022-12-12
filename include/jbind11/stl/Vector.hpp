@@ -108,7 +108,11 @@ namespace jbind11
 
                 for(Value& value : vector)
                 {
-                    arrayList.add(env, Caster<Value>::cast(env, value));
+                    // use java::Object in the future for automatic
+                    // reference handling ? 
+                    jobject jval = Caster<Value>::cast(env, value);
+                    arrayList.add(env, jval);
+                    env->DeleteLocalRef(jval);
                 }
 
                 return arrayList.getJavaObject();

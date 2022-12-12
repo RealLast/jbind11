@@ -59,12 +59,12 @@ namespace jbind11
 
             // Exctracts the C++ instance from the handle, uses the pointer to member to 
             // access the corresponding native variable and uses Caster<Class> to convert it to a java object.
-            virtual jobject getValue(JNIEnv* env, JavaHandle& javaHandle) = 0;
+            virtual jobject getValue(JNIEnv* env, JavaHandle javaHandle) = 0;
 
             // Exctracts the C++ instance from the handle, uses the pointer to member to 
             // access the corresponding native variable and uses Caster<Class> to assign the value of 
             // the passed java object to it.
-            virtual void setValue(JNIEnv* env, JavaHandle& handle, jobject object) = 0;
+            virtual void setValue(JNIEnv* env, JavaHandle handle, jobject object) = 0;
 
           //  virtual void* getPointerToMember(JavaHandle* handle);
 

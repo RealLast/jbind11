@@ -24,8 +24,9 @@ namespace jbind11
         public:
             std::map<std::string, std::shared_ptr<AbstractJavaField>> javaFields;
 
-            // I.e., constant static variables.
+            // I.e., public static variables.
             std::map<std::string, std::shared_ptr<JavaAttribute>> javaAttributes;
+
             static std::string staticClassName;
             static std::string staticPackageName;
 
@@ -114,11 +115,11 @@ namespace jbind11
                 return it->second.get();
             }
 
-            jbind11::JavaHandle* spawnNewObject() const
+            jbind11::JavaHandle* spawnNewHandle() const
             {
                 T* t = new T();
                 JavaHandle* handle = new JavaHandle();
-                handle->set(t);
+                handle->setNativeDataTakeOwnership(t);
                 return handle;
             }
 
@@ -143,7 +144,7 @@ namespace jbind11
                 return *this;
             }
 
-            // Define a/access constant static variable
+            // Define a/access static variable
             JavaAttribute& attr(const std::string& name)
             {
                 std::shared_ptr<JavaAttribute> attribute(new JavaAttribute(name));

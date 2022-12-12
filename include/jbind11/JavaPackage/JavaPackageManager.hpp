@@ -4,7 +4,7 @@
 #include "JavaPackageInitializeFunctionInvoker.hpp"
 #include <vector>
 #include <memory.h>
-
+#include <iostream>
 namespace jbind11
 {
     class JavaPackageManager
@@ -27,6 +27,8 @@ namespace jbind11
             template<typename JavaClass>
             AbstractJavaClass* findClass()
             {
+                std::cout << "find class  1\n" << std::flush;
+
                 // Get the instance of the class that was registered to the package.
                 std::string className = JavaClass::staticClassName;
 

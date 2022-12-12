@@ -25,7 +25,7 @@
     static void jbindInitMyPackage(JavaPackage& p)
     // FUNCTION DEFINITION GOES HERE
 */
-#define JBIND_PACKAGE(packageName, packageVariable) \
+#define JBIND11_PACKAGE(packageName, packageVariable) \
     static void JBIND_CONCATENATE(jbindInit, packageName)(jbind11::JavaPackage& packageVariable);\
     extern "C" JBIND_EXPORT jbind11::JavaPackage* JBIND_CONCATENATE(jbind11, packageName) = new jbind11::JavaPackage(JBIND_TO_STRING(packageName));\
     extern "C" JBIND_EXPORT jbind11::JavaPackageRegistrar JBIND_CONCATENATE(jbindJavaPackageRegistrar, packageName)(JBIND_CONCATENATE(jbind11, packageName), &JBIND_CONCATENATE(jbindInit, packageName));\

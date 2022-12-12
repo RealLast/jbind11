@@ -21,7 +21,7 @@ namespace jbind11
 
             }
 
-            virtual jobject getJavaObject() const
+            virtual jobject getJavaObject()
             {
                 return Caster<T>::cast(JNIUtils::getEnv(), this->attributeValue);
             }
