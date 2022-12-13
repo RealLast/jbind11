@@ -16,7 +16,8 @@ namespace jbind11
     // Suitable for pointers of native C++ types that are wrapped by jbind11.
     // Not suitable for pointers to primitives.
     template<typename T>
-    struct Caster<T, typename std::enable_if<std::is_pointer<T>::value && !std::is_arithmetic<T>::value>::type> 
+    struct Caster<T, typename std::enable_if<std::is_pointer<T>::value && !std::is_arithmetic<T>::value &&
+                         !std::is_same<T, jobject>::value && !std::is_same<T, jclass>::value && !std::is_same<T, jstring>::value>::type> 
     {
 
         public:
@@ -100,7 +101,7 @@ namespace jbind11
 
             static std::string canonicalTypeName()
             {
-                return JNIUtils::getJavaClassNameOfPrimitiveType<T>();
+                return JNIUtils::getJavaClassNameOfPrimitiveType<NoPointerType>();
             }
     };
 }

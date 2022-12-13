@@ -8,14 +8,15 @@
 #include "cast.hpp"
 namespace jbind11
 {
-    template<typename Return, typename... Params>
+    template<typename Class, typename Return, typename... Params>
     class JavaFunction : public AbstractJavaFunction
     {
         private:
             typedef std::tuple<Params...>               Tuple;
-            typedef std::function<Return(Params...)>    Function;
+            typedef Return (Class::*Function)(Params...)     ;
 
             Function function;
+            std::string functionName;
 
             template<int C, typename I, typename... Is>
             void javaArrayListToStdTuple(JavaArrayList& arrayList, Tuple& tuple)
@@ -30,61 +31,86 @@ namespace jbind11
                 // Base case
             }
 
-            void verifyStack()
+            void verifyStack(JavaArrayList& stack)
             {
-                if(arrayList.size() != sizeof...(Params))
+                if(stack.size() != sizeof...(Params))
                 {
                     JBIND_THROW("Cannot invoke function \"" << functionName << "\".\n"
                         << "This function has " << sizeof...(Params) 
-                            << "parameters, but only " << arrayList.size() << " were provided.");
+                            << "parameters, but only " << stack.size() << " were provided.");
                 }
             }
 
-            void apply(Tuple& stack, Function& function)
+            Return apply(Tuple& stack, Function& function, Class& instance)
             {
+                // Bind pointer-to-member-function and instance in function.
+                // Therefore, we do not need to pass instance to applyTupleToStdFunction().
+                // Makes the TemplatePackUtils a bit prettier..
+                std::function<Return(Params...)> func = 
+                    TemplatePackUtils::bind_with_variadic_placeholders<Class, Return, Params...> (function, &instance);
+
                 // If C++17, we can use std::apply.
-                TemplatePackUtils::applyTupleToFunction(stack, function);
+                // < C++17 we need to do it manually.
+                return TemplatePackUtils::applyTupleToStdFunction<Return>(stack, func);
+            }
+
+            template<typename U = Return>
+            typename std::enable_if<!std::is_void<U>::value, jobject>::type
+            invoke(Tuple& invocationStack, Class& instance)
+            {
+                Return r = apply(invocationStack, function, instance);
+                return cast(r);
+            }
+
+            template<typename U = Return>
+            typename std::enable_if<std::is_void<U>::value, jobject>::type
+            invoke(Tuple& invocationStack, Class& instance)
+            {
+                apply(invocationStack, function, instance);
+                return nullptr;
             }
 
 
+        
         public:
             JavaFunction()
             {
 
             }
 
-            JavaFunction(Function function) : function(function)
+            JavaFunction(std::string& functionName, Function function) : functionName(functionName), function(function)
             {
 
             }
 
-            template<typename U = Return>
-            std::enable_if<!std::is_void<U>::value>::type
-            jobject execute(JavaArrayList stack)
+        
+            jobject execute(JavaArrayList stack, JavaHandle handle)
             {
-                verifyStack();
+                verifyStack(stack);
                 std::tuple<Params...> invocationStack;
                 javaArrayListToStdTuple<0, Params...>(stack, invocationStack);
-                Return r = apply(invocationStack, function);
-                return cast(r);
+
+                Class& instance = *handle.getNativeData<Class>();
+               
+               return invoke<Return>(invocationStack, instance);
             }
 
-            template<typename U = Return>
-            std::enable_if<std::is_void<U>::value>::type
-            jobject execute(JavaArrayList stack)
-            {
-                verifyStack();
-                std::tuple<Params...> invocationStack;
-                javaArrayListToStdTuple<0, Params...>(stack, invocationStack);
-                apply(invocationStack, function);
+            // template<typename U = Return>
+            // typename std::enable_if<std::is_void<U>::value, jobject>::type
+            // execute(JavaArrayList stack)
+            // {
+            //     verifyStack(stack);
+            //     std::tuple<Params...> invocationStack;
+            //     javaArrayListToStdTuple<0, Params...>(stack, invocationStack);
+            //    // apply(invocationStack, function);
 
-                // Is void function, no object to return.
-                return nullptr;
-            }
+            //     // Is void function, no object to return.
+            //     return nullptr;
+            // }
 
             std::string getFunctionDefinition()
             {
-                return FunctionGenerator<Return, Params...>::generate();
+                return FunctionGenerator<Return, Params...>::generate(functionName);
             }
 
     };

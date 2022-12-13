@@ -35,6 +35,15 @@ namespace jbind11
                     "\t" << field->getSetterDeclaration()                       << "\n\n";
                 }
 
+                std::vector<std::string> functionNames = javaClass->getFunctionNames();
+                for(size_t i = 0; i < functionNames.size(); i++)
+                {
+                    AbstractJavaFunction* function = javaClass->getFunction(functionNames[i]);
+
+                    content <<
+                    "\t" << function->getFunctionDefinition()                   << "\n\n"; 
+                }
+
                 content << "}";
            
                 classFile = JavaClassFile(javaClass->getJavaClassName(), content.str());

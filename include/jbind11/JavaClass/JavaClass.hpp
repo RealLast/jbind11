@@ -16,6 +16,8 @@
 
 #include "JavaHandle/JavaHandle.hpp"
 
+#include "JavaFunction/JavaFunction.hpp"
+
 namespace jbind11
 {
     template<typename T>
@@ -26,6 +28,8 @@ namespace jbind11
 
             // I.e., public static variables.
             std::map<std::string, std::shared_ptr<JavaAttribute>> javaAttributes;
+
+            std::map<std::string, std::shared_ptr<AbstractJavaFunction>> javaFunctions;
 
             static std::string staticClassName;
             static std::string staticPackageName;
@@ -115,6 +119,18 @@ namespace jbind11
                 return it->second.get();
             }
 
+            AbstractJavaFunction* getFunction(const std::string& functionName)
+            {
+                auto it = this->javaFunctions.find(functionName);
+
+                if(it == this->javaFunctions.end())
+                {
+                    JBIND_THROW("Error, cannot get function \"" << functionName << "\" from JavaClass \"" << this->className << "\". Function was not registered.");
+                }
+
+                return it->second.get();
+            }
+
             jbind11::JavaHandle* spawnNewHandle() const
             {
                 T* t = new T();
@@ -152,9 +168,19 @@ namespace jbind11
                 return *attribute.get();
             }
 
-            template<typename Function>
-            JavaClass& def(const char* name, Function&& f)
+            template<typename Class, typename Return, typename... Params>
+            JavaClass& def(const char* name, Return (Class::*p)(Params...))
             {
+                typedef JavaFunction<Class, Return, Params...> Function;
+                std::string nameStr = name;
+                
+                std::shared_ptr<Function> func =
+                    std::make_shared<Function>(nameStr, p);
+
+                this->javaFunctions.insert(
+                        std::make_pair(name, 
+                            std::static_pointer_cast<AbstractJavaFunction>(func)));
+
                 return *this;
             }
            
@@ -182,6 +208,16 @@ namespace jbind11
                     fieldNames.push_back(entry.first);
                 }
                 return fieldNames;
+            }
+
+            virtual std::vector<std::string> getFunctionNames()
+            {
+                std::vector<std::string> functionNames;
+                for(const auto& entry : this->javaFunctions)
+                {
+                    functionNames.push_back(entry.first);
+                }
+                return functionNames;
             }
 
 

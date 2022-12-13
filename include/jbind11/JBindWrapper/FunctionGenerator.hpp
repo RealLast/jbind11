@@ -11,47 +11,55 @@ namespace jbind11
     {
         private:
             template<typename U>
-            std::string typeName()
+            typename std::enable_if<!std::is_void<U>::value, std::string>::type
+            static typeName()
             {
                 return Caster<U>::canonicalTypeName();
             }
 
-            template<int C, typename I, typename... Is>
-            void tupleTypesToParameterList(std::stringstream& parameterList)
+            template<typename U>
+            typename std::enable_if<std::is_void<U>::value, std::string>::type
+            static typeName()
             {
-                parameterList << typeName<I>() << " param" << I;
+                return "void";
+            }
+
+            template<int C, typename I, typename... Is>
+            static void tupleTypesToParameterList(std::stringstream& parameterList)
+            {
+                parameterList << typeName<I>() << " param" << C;
 
                 // If it is not the last parameter yet
                 // add a ", "
                 if(C != sizeof...(Params) - 1)
                 {
-                    ss << ", ";
+                    parameterList << ", ";
                 }
 
                 tupleTypesToParameterList<C + 1, Is...>(parameterList);
             }
 
             template<int C>
-            void tupleTypesToParameterList()
+            static void tupleTypesToParameterList(std::stringstream& parameterList)
             {
                 // Base case
             }
 
             template<int C, typename I, typename... Is>
-            void buildStack(std::stringstream& stackInstructions)
+            static void buildStack(std::stringstream& stackInstructions)
             {
-                stackInstructions << "invocationStack.add((java.lang.Object) param" << I << ");"
+                stackInstructions << "invocationStack.add((java.lang.Object) param" << C << ");";
                 buildStack<C + 1, Is...>(stackInstructions);
             }
 
             template<int C>
-            void buildStack(std::stringstream& stackInstructions)
+            static void buildStack(std::stringstream& stackInstructions)
             {
                 // Base case
             }
 
 
-            std::string parameterList()
+            static std::string parameterList()
             {
                 std::stringstream ss;
                 ss << "(";
@@ -61,39 +69,41 @@ namespace jbind11
                 return ss.str();
             }
 
-            std::string invocationStack()
+            static std::string invocationStack()
             {
                 std::stringstream ss;
                 ss << "java.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();\n";
-                uildStack<0, Params...>(ss);
+                buildStack<0, Params...>(ss);
             
                 return ss.str();
             }
 
             template<typename U = Return>
-            std::enable_if<!std::is_void<U>::value, std::string>::type nativeInvokeReturn(const std::string& functionName)
+            static typename std::enable_if<!std::is_void<U>::value, std::string>::type 
+            nativeInvokeReturn(const std::string& functionName)
             {
                 std::stringstream ss;
-                ss << "jobject result = nativeInvoke(" << functionName << ", invocationStack);"
-                ss << "return (" << Caster<Return>::canonicalTypeName() << ") result;"
+                ss << "jobject result = nativeInvoke(" << functionName << ", invocationStack);";
+                ss << "return (" << Caster<Return>::canonicalTypeName() << ") result;";
                 return ss.str();
             }
 
-            std::enable_if<std::is_void<U>::value, std::string>::type nativeInvokeReturn(const std::string& functionName)
+            template<typename U = Return>
+            static typename std::enable_if<std::is_void<U>::value, std::string>::type 
+            nativeInvokeReturn(const std::string& functionName)
             {
                 std::stringstream ss;
-                ss << "nativeInvoke(" << functionName << ", invocationStack);"
+                ss << "nativeInvoke(" << functionName << ", invocationStack);";
                 return ss.str();
             }
 
         public:
-            std::string generate(const std::string& functionName)
+            static std::string generate(const std::string& functionName)
             {
                 std::stringstream ss;
 
-
-                // public Return functionName(Type1 param1, Type2 param2, ...);
-                ss << "\t public native " << typeName<Return>() << " " << functionName << " (" << parameterList << ")\n";
+                // public ReturnType functionName(Type1 param1, Type2 param2, ...);
+                ss << "\t public native " << typeName<Return>() << " " << functionName << " (" << parameterList() << ")\n";
                 ss << "{\n";
                 /*
                     java.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();
@@ -107,8 +117,8 @@ namespace jbind11
                 // return 
                 // except if Return = void, then:
                 // nativeInvoke(functionName, invocationStack);
-                ss << nativeInvokeReturn() << "\n";
-                ss << "};"
+                ss << nativeInvokeReturn(functionName) << "\n";
+                ss << "};";
                 return ss.str();
             }
     };

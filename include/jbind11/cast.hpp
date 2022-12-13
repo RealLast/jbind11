@@ -2,6 +2,10 @@
 #include "Caster/Caster.hpp"
 #include "Caster/Primitives.hpp"
 #include "Caster/PointerObjects.hpp"
+#include "Caster/jobject.hpp"
+#include "Caster/jclass.hpp"
+#include "Caster/jstring.hpp"
+
 #include "stl/stl.hpp"
 #include "JNIUtils/JNIUtils.hpp"
 

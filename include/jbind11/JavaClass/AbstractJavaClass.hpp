@@ -1,5 +1,6 @@
 #pragma once
 #include "JavaField/AbstractJavaField.hpp"
+#include "JavaFunction/AbstractJavaFunction.hpp"
 
 namespace jbind11
 {
@@ -22,6 +23,11 @@ namespace jbind11
 
             virtual AbstractJavaField* getField(const std::string& fieldName) = 0;
             virtual std::vector<std::string> getFieldNames() = 0;
+
+            virtual AbstractJavaFunction* getFunction(const std::string& functionName) = 0;
+            virtual std::vector<std::string> getFunctionNames() = 0;
+
+            
 
 
     };

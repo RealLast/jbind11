@@ -3,6 +3,8 @@
 #include "PrimitiveGetterFunctions.hpp"
 #include "PrimitiveSignatures.hpp"
 #include "PrimitiveMethods.hpp"
+#include "TypeName.hpp"
+#include "jbind11_throw.hpp"
 
 namespace jbind11
 {
