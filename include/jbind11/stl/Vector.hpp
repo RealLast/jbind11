@@ -87,13 +87,13 @@ namespace jbind11
 
                 // javaObject is native java type, hence we copy.
 
-                JavaNativeClasses::JavaArrayList javaArrayList(env, javaObject);
+                JavaNativeClasses::JavaArrayList javaArrayList(javaObject);
 
-                size_t size = javaArrayList.size(env);
+                size_t size = javaArrayList.size();
 
-                for(size_t i = 0; i < javaArrayList.size(env); i++)
+                for(size_t i = 0; i < javaArrayList.size(); i++)
                 {
-                    result.push_back(Caster<Value>::fromJavaObject(env, javaArrayList.get(env, i)));
+                    result.push_back(Caster<Value>::fromJavaObject(env, javaArrayList.get(i)));
                 }
 
                 return result;
@@ -104,14 +104,14 @@ namespace jbind11
                 // we map vector to ArrayList. Since both are native types in their corresponding language,
                 // we copy the values.
 
-                JavaNativeClasses::JavaArrayList arrayList(env, vector.size());
+                JavaNativeClasses::JavaArrayList arrayList(vector.size());
 
                 for(Value& value : vector)
                 {
                     // use java::Object in the future for automatic
                     // reference handling ? 
-                    jobject jval = Caster<Value>::cast(env, value);
-                    arrayList.add(env, jval);
+                    jobject jval = Caster<Value>::cast(value);
+                    arrayList.add(jval);
                     env->DeleteLocalRef(jval);
                 }
 

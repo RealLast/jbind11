@@ -14,36 +14,36 @@ namespace jbind11
 
                 jobject javaObject;
 
-                void createNewArrayList(JNIEnv* env, size_t initialCapacity)
+                void createNewArrayList(size_t initialCapacity)
                 {
                     // Call constructor ArrayList(Integer initialCapacity).
                     // "I" is the signature of "Integer", we specify it to 
                     // use the correct constructor.
                     this->javaObject = 
-                        JNIUtils::createObjectFromClassName(env, JAVA_CLASS_NAME, "I", initialCapacity);
+                        JNIUtils::createObjectFromClassName(JNIUtils::getEnv(), JAVA_CLASS_NAME, "I", initialCapacity);
                 }
 
-                void createNewArrayList(JNIEnv* env)
+                void createNewArrayList()
                 {
                     // "" means we use the standard constructor with no parameters. 
                     this->javaObject = 
-                        JNIUtils::createObjectFromClassName(env, JAVA_CLASS_NAME, "");
+                        JNIUtils::createObjectFromClassName(JNIUtils::getEnv(), JAVA_CLASS_NAME, "");
                 }
 
             public:
-                JavaArrayList(JNIEnv* env)
+                JavaArrayList()
                 {
-                    this->createNewArrayList(env);
+                    this->createNewArrayList(JNIUtils::getEnv());
                 }
 
-                JavaArrayList(JNIEnv* env, size_t initialCapacity)
+                JavaArrayList(size_t initialCapacity)
                 {
-                    this->createNewArrayList(env, initialCapacity);
+                    this->createNewArrayList(JNIUtils::getEnv(), initialCapacity);
                 }
 
-                JavaArrayList(JNIEnv* env, jobject javaObject) 
+                JavaArrayList(jobject javaObject) 
                 {
-                    std::string className = JNIUtils::getNameOfClassOfObject(env, javaObject);
+                    std::string className = JNIUtils::getNameOfClassOfObject(JNIUtils::getEnv(), javaObject);
 
                     if(className != JAVA_CLASS_NAME)
                     {
@@ -54,8 +54,9 @@ namespace jbind11
                     this->javaObject = javaObject;
                 }
 
-                void add(JNIEnv* env, jobject objectToAdd)
+                void add(jobject objectToAdd)
                 {
+                    JNIEnv* env = JNIUtils::getEnv();
                     jmethodID arrayListAddMethodID = JNIUtils::getMethodID(env, this->javaObject, "add", "(Ljava/lang/Object;)Z");
 
                     if(arrayListAddMethodID == nullptr)
@@ -69,8 +70,9 @@ namespace jbind11
                     env->CallBooleanMethod(this->javaObject, arrayListAddMethodID, objectToAdd);
                 }
 
-                size_t size(JNIEnv* env)
+                size_t size()
                 {
+                    JNIEnv* env = JNIUtils::getEnv();
                     jmethodID arrayListSizeMethodID = JNIUtils::getMethodID(env, this->javaObject, "size", "()I");
 
                     if(arrayListSizeMethodID == nullptr)
@@ -82,8 +84,9 @@ namespace jbind11
                     return env->CallIntMethod(this->javaObject, arrayListSizeMethodID);
                 }
 
-                jobject get(JNIEnv* env, size_t index)
+                jobject get(size_t index)
                 {
+                    JNIEnv* env = JNIUtils::getEnv();
                     jmethodID arrayListGetMethod = JNIUtils::getMethodID(env, this->javaObject, "get", "(I)Ljava/lang/Object;");
 
                     if(arrayListGetMethod == nullptr)
