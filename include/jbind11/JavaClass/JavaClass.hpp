@@ -67,7 +67,7 @@ namespace jbind11
                     JBIND_THROW("Error, wrapper for the native C++ class \"" << TypeName<T>::get() << " was added to multiple different packages."
                     << "Once to package \"" << JavaClass<T>::staticPackageName << "\" and once under \"" << this->packageHandle->getPackageName() << "\".");
                 }
-                JavaClass<T>::staticClassName = this->className;
+                JavaClass<T>::staticPackageName = this->packageHandle->getPackageName();
             }
 
         public:

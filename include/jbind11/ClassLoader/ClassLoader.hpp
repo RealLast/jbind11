@@ -33,7 +33,7 @@ namespace jbind11
                     (Quote from comments below the stackoverflow answer).
 
                 */
-                std::string className = "JBind/JBindWrapper";
+                std::string className = "jbind11/JBindWrapper";
                 auto randomClass = env->FindClass(className.c_str());
                 if(randomClass == nullptr)
                 {

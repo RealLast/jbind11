@@ -52,6 +52,69 @@ namespace jbind11
             return methodID;
         }
 
+        static inline jclass getSuperClass(JNIEnv* env, jclass cls)
+        {
+            jclass superClass = env->GetSuperclass(cls);
+
+            return superClass;
+        }
+
+        static inline std::string getNameOfSuperClass(JNIEnv* env, jclass cls)
+        {
+            jclass superClass = getSuperClass(env, cls);
+            std::string className = getClassName(env, superClass);
+            env->DeleteLocalRef(superClass);
+
+            return className;
+        }
+
+        static inline std::string getNameOfSuperClassOfObject(JNIEnv* env, jobject object)
+        {
+            jclass cls = getClassOfObject(env, object);
+
+            std::string className = getNameOfSuperClass(env, cls);
+            env->DeleteLocalRef(cls);
+
+            return className;
+        }
+
+        static inline std::vector<std::string> getInheritanceList(JNIEnv* env, jclass cls)
+        {
+            std::vector<std::string> inheritanceList;
+
+            std::string className = getClassName(env, cls);
+            inheritanceList.push_back(className);
+
+
+            jclass superClass = getSuperClass(env, cls);
+            jclass superSuperClass;
+
+            while(className != "java.lang.Object")
+            {
+                className = getClassName(env, superClass);
+                inheritanceList.push_back(className);
+
+                jclass superSuperClass = getSuperClass(env, superClass);
+                env->DeleteLocalRef(superClass);
+
+                superClass = superSuperClass;
+            }
+
+            env->DeleteLocalRef(superClass);
+
+            return inheritanceList;
+        }
+
+        static inline std::vector<std::string> getInheritanceListOfObject(JNIEnv* env, jobject object)
+        {
+            std::vector<std::string> inheritanceList;
+            jclass cls = getClassOfObject(env, object);
+            inheritanceList = getInheritanceList(env, cls);
+            env->DeleteLocalRef(cls);
+
+            return inheritanceList;
+        }
+
         
     }
 }

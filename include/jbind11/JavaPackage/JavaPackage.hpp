@@ -49,20 +49,22 @@ namespace jbind11
                     << "The class \"" << canonicalName << "\" does not belong to package \"" << this->packageName << "\"");
                 }
                 
-                size_t length = this->packageName.size();
-                return canonicalName.substr(length);
+                size_t length = this->packageName.size() + 1; // + 1 to skip the dot.
+                return canonicalName.substr(length, canonicalName.size());
             }
 
             bool doesCanonicalClassNameBelongToPackage(const std::string& canonicalName) const
             {
                 // Canonical name = packageName.className
                 // Returns true, if packageName = this->packageName.
+                printf("startswith %s %s %d\n", canonicalName.c_str(), this->packageName.c_str(), this->startsWith(canonicalName, this->packageName));
                 if(!this->startsWith(canonicalName, this->packageName))
                 {
                     return false;
                 }
 
                 std::string className = this->getClassNameFromCanonicalName(canonicalName);
+                printf("Starts with yes %s\n", className.c_str());
                 return this->hasClass(className);
             }
 

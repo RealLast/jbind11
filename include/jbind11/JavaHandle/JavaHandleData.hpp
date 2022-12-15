@@ -24,8 +24,8 @@ namespace jbind11
         private:
             AbstractJavaClass* javaClass;
 
-            void* rawPtr;
-            jobject javaObject;
+            void* rawPtr = nullptr;
+            jobject javaObject = nullptr;
 
             bool nativeDataAssigned = false;
             bool javaObjectReferenceAssigned = false;
@@ -44,13 +44,13 @@ namespace jbind11
 
             virtual ~JavaHandleData()
             {
-                this->handleManager->registerHandle(this);
+                this->handleManager->removeHandle(this);
             }
 
             template<typename T>
             void setNativeData(T* value)
             {
-                this->rawPtr = static_cast<void*>(&value);
+                this->rawPtr = static_cast<void*>(value);
                 this->javaClass = getPackageManager().findClass<JavaClass<T>>();
 
                 if(this->javaClass == nullptr)
@@ -69,7 +69,7 @@ namespace jbind11
 
             jobject getJavaObjectReference()
             {
-                return javaObject;
+                return this->javaObject;
             }
 
             template<typename T>

@@ -12,8 +12,8 @@ namespace jbind11
     class JavaFunction : public AbstractJavaFunction
     {
         private:
-            typedef std::tuple<Params...>               Tuple;
-            typedef Return (Class::*Function)(Params...)     ;
+            typedef std::tuple<Params...> Tuple;
+            typedef Return (Class::*Function)(Params...); // Defines type Function (a bit confusing syntax).
 
             Function function;
             std::string functionName;
@@ -41,7 +41,7 @@ namespace jbind11
                 }
             }
 
-            Return apply(Tuple& stack, Function& function, Class& instance)
+            Return apply(Function& function, Class& instance, Tuple& stack)
             {
                 // Bind pointer-to-member-function and instance in function.
                 // Therefore, we do not need to pass instance to applyTupleToStdFunction().
@@ -56,17 +56,17 @@ namespace jbind11
 
             template<typename U = Return>
             typename std::enable_if<!std::is_void<U>::value, jobject>::type
-            invoke(Tuple& invocationStack, Class& instance)
+            invoke(Class& instance, Tuple& invocationStack)
             {
-                Return r = apply(invocationStack, function, instance);
+                Return r = apply(function, instance, invocationStack);
                 return cast(r);
             }
 
             template<typename U = Return>
             typename std::enable_if<std::is_void<U>::value, jobject>::type
-            invoke(Tuple& invocationStack, Class& instance)
+            invoke(Class& instance, Tuple& invocationStack)
             {
-                apply(invocationStack, function, instance);
+                apply(function, instance, invocationStack);
                 return nullptr;
             }
 
@@ -84,7 +84,7 @@ namespace jbind11
             }
 
         
-            jobject execute(JavaArrayList stack, JavaHandle handle)
+            jobject execute(JavaHandle handle, JavaArrayList stack)
             {
                 verifyStack(stack);
                 std::tuple<Params...> invocationStack;
@@ -92,7 +92,7 @@ namespace jbind11
 
                 Class& instance = *handle.getNativeData<Class>();
                
-               return invoke<Return>(invocationStack, instance);
+               return invoke<Return>(instance, invocationStack);
             }
 
             // template<typename U = Return>

@@ -48,7 +48,7 @@ namespace jbind11
             template<int C, typename I, typename... Is>
             static void buildStack(std::stringstream& stackInstructions)
             {
-                stackInstructions << "invocationStack.add((java.lang.Object) param" << C << ");";
+                stackInstructions << "\t\tinvocationStack.add((java.lang.Object) param" << C << ");\n";
                 buildStack<C + 1, Is...>(stackInstructions);
             }
 
@@ -62,17 +62,14 @@ namespace jbind11
             static std::string parameterList()
             {
                 std::stringstream ss;
-                ss << "(";
                 tupleTypesToParameterList<0, Params...>(ss);
-                ss << ");";
-
                 return ss.str();
             }
 
             static std::string invocationStack()
             {
                 std::stringstream ss;
-                ss << "java.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();\n";
+                ss << "\t\tjava.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();\n";
                 buildStack<0, Params...>(ss);
             
                 return ss.str();
@@ -83,8 +80,8 @@ namespace jbind11
             nativeInvokeReturn(const std::string& functionName)
             {
                 std::stringstream ss;
-                ss << "jobject result = nativeInvoke(" << functionName << ", invocationStack);";
-                ss << "return (" << Caster<Return>::canonicalTypeName() << ") result;";
+                ss << "\t\tjava.lang.Object result = nativeInvoke(\"" << functionName << "\", invocationStack);\n";
+                ss << "\t\treturn (" << Caster<Return>::canonicalTypeName() << ") result;";
                 return ss.str();
             }
 
@@ -93,7 +90,7 @@ namespace jbind11
             nativeInvokeReturn(const std::string& functionName)
             {
                 std::stringstream ss;
-                ss << "nativeInvoke(" << functionName << ", invocationStack);";
+                ss << "\t\tnativeInvoke(\"" << functionName << "\", invocationStack);";
                 return ss.str();
             }
 
@@ -103,8 +100,8 @@ namespace jbind11
                 std::stringstream ss;
 
                 // public ReturnType functionName(Type1 param1, Type2 param2, ...);
-                ss << "\t public native " << typeName<Return>() << " " << functionName << " (" << parameterList() << ")\n";
-                ss << "{\n";
+                ss << "public " << typeName<Return>() << " " << functionName << "(" << parameterList() << ")\n";
+                ss << "\t{\n";
                 /*
                     java.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();
                     invocationStack.add((java.lang.Object) param1);
@@ -118,7 +115,7 @@ namespace jbind11
                 // except if Return = void, then:
                 // nativeInvoke(functionName, invocationStack);
                 ss << nativeInvokeReturn(functionName) << "\n";
-                ss << "};";
+                ss << "\t};";
                 return ss.str();
             }
     };

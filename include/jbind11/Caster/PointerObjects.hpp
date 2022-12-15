@@ -26,10 +26,8 @@ namespace jbind11
 
             static TPointerType fromJavaObject(JNIEnv* env, jobject javaObject)
             {
-                std::cout << "pointer form java object 1 \n" << std::flush ;
                 // Analog to pybind11::find_registered_python_instance.
                 JavaHandle handle = getHandles().findRegisteredJavaInstance(javaObject);
-                std::cout << "pointer form java object 2 \n" << std::flush ;
 
                 if(handle.isValid())
                 {
@@ -92,9 +90,10 @@ namespace jbind11
 
                     // forward caster if copy constructor is available.
                   //  return Caster<NoPointerType>(*valuePtr);
-                    JBIND_THROW("Error, cannot cast java object to pointer type \"" << TypeName<T>::get() << "\".\n"
-                    << "Casting to pointers is only supported for java objects that have been created using jbind11.\n"
-                    << "The provided type is either a primitive type or a java type that was not generated with jbind11.\n");
+        
+                    JBIND_THROW("Error, cannot cast pointer type \"" << TypeName<T>::get() << "to java object\".\n"
+                    << "Could not find jbind11 handle that has created the object the pointer points to.\n"
+                    << "Casting pointers to a java object currently is only supported for objects that are managed by a JavaHandle\n");
                 }
 
             }

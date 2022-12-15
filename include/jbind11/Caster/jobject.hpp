@@ -26,7 +26,7 @@ namespace jbind11
             // Here, we directly return a jobject.
             jobject generateObject(...)
             {
-                jobject object = createNewObjectFromClassSignature(...);
+                jobject object = createObjectFromClassName(...);
                 ...
                 return 
             }

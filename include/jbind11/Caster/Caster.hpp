@@ -57,8 +57,6 @@ namespace jbind11
                 // canonical name = package.classname
                 std::string javaClassCanonicalName = javaClass->getCanonicalName();
 
-
-
                 // This calls the constructor of the wrapper class.
                 // That constructor will call JBindWrapper_init().
                 jobject javaObject = JNIUtils::createObjectFromClassName(env, javaClassCanonicalName, "");

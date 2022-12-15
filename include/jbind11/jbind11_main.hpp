@@ -16,12 +16,6 @@ extern "C"
         jbind11::getPackageManager().initializePackages();
 
 
-        jbind11::JavaPackage* package = jbind11::getPackageManager().getPackage("JavaCLAIDDataTypes");
-
-        if(package == nullptr)
-        {
-            JBIND_THROW("Error package not found");
-        }
 
         return JNI_VERSION_1_6;
     }
