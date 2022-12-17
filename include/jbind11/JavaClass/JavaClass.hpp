@@ -171,11 +171,11 @@ namespace jbind11
             template<typename Class, typename Return, typename... Params>
             JavaClass& def(const char* name, Return (Class::*p)(Params...))
             {
-                typedef JavaFunction<false, Class, Return, Params...> NonStaticFunction;
+                typedef NonStaticJavaFunction<Class, Return, Params...> Function;
                 std::string nameStr = name;
                 
-                std::shared_ptr<NonStaticFunction> func =
-                    std::make_shared<NonStaticFunction>(nameStr, p);
+                std::shared_ptr<Function> func =
+                    std::make_shared<Function>(nameStr, p);
 
                 this->javaFunctions.insert(
                         std::make_pair(name, 
@@ -187,11 +187,11 @@ namespace jbind11
             template<typename Return, typename... Params>
             JavaClass& def_static(const char* name, Return (*p)(Params...))
             {
-                typedef JavaFunction<true, Class, Return, Params...> StaticFunction;
+                typedef StaticJavaFunction<Return, Params...> Function;
                 std::string nameStr = name;
                 
-                std::shared_ptr<StaticFunction> func =
-                    std::make_shared<StaticFunction>(nameStr, p);
+                std::shared_ptr<Function> func =
+                    std::make_shared<Function>(nameStr, p);
 
                 this->javaFunctions.insert(
                         std::make_pair(name, 

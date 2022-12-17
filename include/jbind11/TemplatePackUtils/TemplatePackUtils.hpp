@@ -54,13 +54,29 @@ namespace jbind11
             return bind_with_variadic_placeholders(p, obj, typename generateIntegerSequence<sizeof...(Args)>::type());
         }
 
-        template<typename Class, typename Return, typename... Params, int ...S>
+        // bind_static_with_variadic_arguments (also please check at the beginning of this
+        // file for definition of a specialized std jbind11_is_placeholder type_trait).
+        template<class Return, class... Args, int... Is>
+        static std::function<Return (Args...)> bind_static_with_variadic_placeholders(Return (*p)(Args...), sequence<Is...>)
+        {
+            // std::function<void (Args...)>  y = std::bind(p, obj, boost::placeholders::_1, boost::placeholders::_2);
+            std::function<Return (Args...)> x = std::bind(p, jbind11_placeholder_template<Is>{}...);
+            return x;
+        }
+
+        template<class Return, class... Args>
+        static std::function<Return (Args...)> bind_static_with_variadic_placeholders(Return (*p)(Args...))
+        {
+            return bind_static_with_variadic_placeholders(p, typename generateIntegerSequence<sizeof...(Args)>::type());
+        }
+
+        template<typename Return, typename... Params, int ...S>
         static Return applyTupleToStdFunction(sequence<S...>, std::tuple<Params...>& tuple, std::function<Return(Params...)> function) 
         {
             return function(std::get<S>(tuple) ...);
         }
 
-        template<typename Class, typename Return, typename... Params>
+        template<typename Return, typename... Params>
         static Return applyTupleToStdFunction(std::tuple<Params...>& tuple, std::function<Return(Params...)> function)
         {
             return applyTupleToStdFunction<Return>(typename generateIntegerSequence<sizeof...(Params)>::type(), tuple, function);

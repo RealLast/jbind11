@@ -41,7 +41,7 @@ namespace jbind11
                     AbstractJavaFunction* function = javaClass->getFunction(functionNames[i]);
 
                     content <<
-                    "\t" << function->getFunctionDefinition()                   << "\n\n"; 
+                    "\t" << function->getFunctionDefinition(javaClass->getCanonicalName()) << "\n\n"; 
                 }
 
                 content << "}";
@@ -75,16 +75,17 @@ namespace jbind11
                 std::stringstream content;
 
                 content  <<
-                    "package " << PACKAGE_NAME << ";"                                                                                       << "\n" <<
-                    "public class " << CLASS_NAME << ""                                                                                     << "\n" <<
-                    "{"                                                                                                                     << "\n" <<
-                    "\tprivate long nativeJavaHandle = 0;"                                                                                  << "\n" <<
-                    "\tprotected native java.lang.Object nativeGet(String fieldName);"                                                      << "\n" <<
-                    "\tprotected native void nativeSet(String fieldName, java.lang.Object value);"                                          << "\n" <<
-                    "\tprotected native java.lang.Object nativeInvoke(String functionName, java.util.ArrayList<java.lang.Object> stack);"   << "\n" <<
-                    "\tprotected native void nativeInit();"                                                                                 << "\n" <<
-                    ""                                                                                                                      << "\n" <<
-                    "\tpublic " << CLASS_NAME << "() { nativeInit(); }"                                                                     << "\n" <<
+                    "package " << PACKAGE_NAME << ";"                                                                                               << "\n" <<
+                    "public class " << CLASS_NAME << ""                                                                                             << "\n" <<
+                    "{"                                                                                                                             << "\n" <<
+                    "\tprivate long nativeJavaHandle = 0;"                                                                                          << "\n" <<
+                    "\tprotected native java.lang.Object nativeGet(String fieldName);"                                                              << "\n" <<
+                    "\tprotected native void nativeSet(String fieldName, java.lang.Object value);"                                                  << "\n" <<
+                    "\tprotected native java.lang.Object nativeInvoke(String functionName, java.util.ArrayList<java.lang.Object> stack);"           << "\n" <<
+                    "\tprotected native static java.lang.Object nativeInvokeStatic(Class cls, String functionName, java.util.ArrayList<java.lang.Object> stack);"     << "\n" <<
+                    "\tprotected native void nativeInit();"                                                                                         << "\n" <<
+                    ""                                                                                                                              << "\n" <<
+                    "\tpublic " << CLASS_NAME << "() { nativeInit(); }"                                                                             << "\n" <<
                     "}";
                 
                 return JavaClassFile(CLASS_NAME, content.str());

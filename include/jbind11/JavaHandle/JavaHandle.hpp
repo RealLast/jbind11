@@ -62,7 +62,7 @@ namespace jbind11
                 this->handleValid = handleData->isValid();
             }
 
-            static JavaHandle invalidHandle()
+            static JavaHandle InvalidHandle()
             {
                 return JavaHandle(false);
             }

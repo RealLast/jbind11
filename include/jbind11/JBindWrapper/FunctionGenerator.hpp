@@ -94,13 +94,42 @@ namespace jbind11
                 return ss.str();
             }
 
+            template<typename U = Return>
+            static typename std::enable_if<!std::is_void<U>::value, std::string>::type 
+            nativeInvokeStaticReturn(const std::string& canonicalClassName, const std::string& functionName)
+            {
+                std::stringstream ss;
+                ss << "\t\tjava.lang.Object result = nativeInvokeStatic(" << canonicalClassName << "\"" << functionName << "\", invocationStack);\n";
+                ss << "\t\treturn (" << Caster<Return>::canonicalTypeName() << ") result;";
+                return ss.str();
+            }
+
+            template<typename U = Return>
+            static typename std::enable_if<std::is_void<U>::value, std::string>::type 
+            nativeInvokeStaticReturn(const std::string& canonicalClassName, const std::string& functionName)
+            {
+                std::stringstream ss;
+                ss << "\t\tnativeInvokeStatic(" << canonicalClassName << ".class, \"" << functionName << "\", invocationStack);";
+                return ss.str();
+            }
+
         public:
-            static std::string generate(const std::string& functionName)
+            // Sadly, the canonical class name is needed in order to support static functions,
+            // which require to specific the calling class.
+            static std::string generate(bool isStatic, const std::string& canonicalClassName, const std::string& functionName)
             {
                 std::stringstream ss;
 
                 // public ReturnType functionName(Type1 param1, Type2 param2, ...);
-                ss << "public " << typeName<Return>() << " " << functionName << "(" << parameterList() << ")\n";
+
+                if(!isStatic)
+                {
+                    ss << "public " << typeName<Return>() << " " << functionName << "(" << parameterList() << ")\n";
+                }
+                else
+                {
+                    ss << "public static " << typeName<Return>() << " " << functionName << "(" << parameterList() << ")\n";
+                }
                 ss << "\t{\n";
                 /*
                     java.util.ArrayList<java.lang.Object> invocationStack = new java.util.ArrayList<java.lang.Object>();
@@ -114,7 +143,14 @@ namespace jbind11
                 // return 
                 // except if Return = void, then:
                 // nativeInvoke(functionName, invocationStack);
-                ss << nativeInvokeReturn(functionName) << "\n";
+                if(!isStatic)
+                {
+                    ss << nativeInvokeReturn(functionName) << "\n"; 
+                }
+                else
+                {
+                    ss << nativeInvokeStaticReturn(canonicalClassName, functionName) << "\n";              
+                }
                 ss << "\t};";
                 return ss.str();
             }

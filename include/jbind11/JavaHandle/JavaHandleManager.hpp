@@ -85,7 +85,7 @@ namespace jbind11
                     }
                 }
 
-                return JavaHandle::invalidHandle();
+                return JavaHandle::InvalidHandle();
             }
     };
 
