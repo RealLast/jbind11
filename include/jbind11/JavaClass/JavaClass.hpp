@@ -163,7 +163,7 @@ namespace jbind11
             // Define a/access static variable
             JavaAttribute& attr(const std::string& name)
             {
-                std::shared_ptr<JavaAttribute> attribute(new JavaAttribute(name));
+                std::shared_ptr<JavaAttribute> attribute(new JavaAttribute(static_cast<AbstractJavaClass*>(this), name));
                 this->javaAttributes.insert(std::make_pair(name, attribute));
                 return *attribute.get();
             }
@@ -171,11 +171,27 @@ namespace jbind11
             template<typename Class, typename Return, typename... Params>
             JavaClass& def(const char* name, Return (Class::*p)(Params...))
             {
-                typedef JavaFunction<Class, Return, Params...> Function;
+                typedef JavaFunction<false, Class, Return, Params...> NonStaticFunction;
                 std::string nameStr = name;
                 
-                std::shared_ptr<Function> func =
-                    std::make_shared<Function>(nameStr, p);
+                std::shared_ptr<NonStaticFunction> func =
+                    std::make_shared<NonStaticFunction>(nameStr, p);
+
+                this->javaFunctions.insert(
+                        std::make_pair(name, 
+                            std::static_pointer_cast<AbstractJavaFunction>(func)));
+
+                return *this;
+            }
+
+            template<typename Return, typename... Params>
+            JavaClass& def_static(const char* name, Return (*p)(Params...))
+            {
+                typedef JavaFunction<true, Class, Return, Params...> StaticFunction;
+                std::string nameStr = name;
+                
+                std::shared_ptr<StaticFunction> func =
+                    std::make_shared<StaticFunction>(nameStr, p);
 
                 this->javaFunctions.insert(
                         std::make_pair(name, 

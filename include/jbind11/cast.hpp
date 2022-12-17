@@ -5,6 +5,7 @@
 #include "Caster/jobject.hpp"
 #include "Caster/jclass.hpp"
 #include "Caster/jstring.hpp"
+#include "Caster/Enum.hpp"
 
 #include "stl/stl.hpp"
 #include "JNIUtils/JNIUtils.hpp"

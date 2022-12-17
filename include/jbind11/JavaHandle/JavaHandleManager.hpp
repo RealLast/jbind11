@@ -72,11 +72,8 @@ namespace jbind11
                     managedDataAddress = static_cast<void*>((*it)->getNativeData<void>());
                     if(managedDataAddress == address)
                     {
-                        std::cout << "get handle 1 \n" << std::flush;
                         jobject javaObject = (*it)->getJavaObjectReference();
-                        std::cout << "get handle 2 " << javaObject << "\n" << std::flush;
                         JavaHandle handle = JavaHandle::getHandleFromObject(JNIUtils::getEnv(), javaObject);
-                        std::cout << "get handle 3 " << handle.getData() << std::flush;
 
                         if(!handle.isValid())
                         {

@@ -127,9 +127,9 @@ namespace jbind11
     // Template specialization for SetterGenerator, since we accept either ArrayList<T> or T[] as input, if T is primitive.
     // Might think about adding support for List<T> and Vector<T>
     template<class T>
-    struct SetterGenerator<T, typename std::enable_if<is_specialization_of<T, std::vector>::value && std::is_arithmetic<typename T::Value>::value>::type>
+    struct SetterGenerator<T, typename std::enable_if<is_specialization_of<T, std::vector>::value && std::is_arithmetic<typename T::value_type>::value>::type>
     {
-        typedef typename T::value_type Value;
+        typedef typename T::value_type ValueType;
         static std::string generateForArrayList(const std::string& fieldName)
         {
             std::stringstream setterDeclaration;
@@ -144,7 +144,7 @@ namespace jbind11
     
 
             std::stringstream setterDeclaration;
-            setterDeclaration << "public void " << "set_" << fieldName << " (" << JNIUtils::getPrimitiveArrayTypeDeclaration<T>() << " value)"
+            setterDeclaration << "public void " << "set_" << fieldName << " (" << JNIUtils::getPrimitiveArrayTypeDeclaration<ValueType>() << " value)"
                               << "{ nativeSet(\"" << fieldName << "\", value); }";
 
             return setterDeclaration.str();

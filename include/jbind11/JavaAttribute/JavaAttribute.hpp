@@ -15,14 +15,16 @@ namespace jbind11
             
             std::shared_ptr<AbstractJavaAttributeValue> attributeValue;
 
+            AbstractJavaClass* parentClass;
+
         public:
 
-            JavaAttribute(const char* name) : attributeName(name)
+            JavaAttribute(AbstractJavaClass* parentClass, const char* name) : parentClass(parentClass), attributeName(name)
             {
 
             }
 
-            JavaAttribute(const std::string& name) : attributeName(name)
+            JavaAttribute(AbstractJavaClass* parentClass, const std::string& name) : parentClass(parentClass), attributeName(name)
             {
 
             }

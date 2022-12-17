@@ -1,8 +1,8 @@
 #pragma once
-#include "jbind11/cast.hpp"
 #include "JavaHandle/JavaHandle.hpp"
 
 #include "JBindWrapper/GetterSetterGenerator.hpp"
+#include "jbind11/cast.hpp"
 
 namespace jbind11
 {
