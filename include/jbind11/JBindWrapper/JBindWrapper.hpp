@@ -69,7 +69,6 @@ extern "C"
 
         JavaHandle* handle = javaClass->spawnNewHandle();
         handle->assignToObject(env, wrappedObject);
-        std::cout << "Init object " << wrappedObject << "\n" << std::flush;
     }
 
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeSet(JNIEnv* env, jobject wrappedObject, jstring jfieldName, jobject value)

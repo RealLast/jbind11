@@ -57,14 +57,12 @@ namespace jbind11
             {
                 // Canonical name = packageName.className
                 // Returns true, if packageName = this->packageName.
-                printf("startswith %s %s %d\n", canonicalName.c_str(), this->packageName.c_str(), this->startsWith(canonicalName, this->packageName));
                 if(!this->startsWith(canonicalName, this->packageName))
                 {
                     return false;
                 }
 
                 std::string className = this->getClassNameFromCanonicalName(canonicalName);
-                printf("Starts with yes %s\n", className.c_str());
                 return this->hasClass(className);
             }
 

@@ -50,7 +50,6 @@ namespace jbind11
             // We assume canonical name is full name, i.e. packageName.className
             AbstractJavaClass* findClassByCanonicalName(const std::string& canonicalName)
             {
-                printf("Registered packages: %lu", javaPackages.size());
                 for(std::unique_ptr<JavaPackage>& package : javaPackages)
                 {
                     // Checks the full class name.
@@ -59,18 +58,11 @@ namespace jbind11
                     // If yes, the className is extracted from the canonicalName, and it is checked whether
                     // the package contains the class or not (that's why we do not check package->hasClass(className) 
                     // manually below).
-                    printf("does belong %s\n", canonicalName.c_str());
                     if(package->doesCanonicalClassNameBelongToPackage(canonicalName))
                     {
-                                            printf("does belong yes\n");
-
                         std::string className = package->getClassNameFromCanonicalName(canonicalName);
-                                                           printf("clsasName %s\n", className.c_str());
-
                         return package->getClass(className);
                     }                    
-                                        printf("does belong no\n");
-
                 }
 
                 return nullptr;
