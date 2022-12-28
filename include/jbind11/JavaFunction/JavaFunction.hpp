@@ -3,6 +3,8 @@
 #include "AbstractJavaFunction.hpp"
 #include "JBindWrapper/FunctionGenerator.hpp"
 #include "TemplatePackUtils/TemplatePackUtils.hpp"
+#include "JavaExtras/JavaExtras.hpp"
+#include "JavaExtras/JavaExtrasTyped.hpp"
 
 #include <functional>
 #include "cast.hpp"
@@ -15,6 +17,8 @@ namespace jbind11
             typedef std::tuple<Params...> Tuple;
 
             std::string functionName;
+            std::shared_ptr<JavaExtras> extras = nullptr;
+
 
             template<int C, typename I, typename... Is>
             void javaArrayListToStdTuple(JavaArrayList& arrayList, Tuple& tuple)
@@ -73,14 +77,30 @@ namespace jbind11
             }
         
         public:
+
             JavaFunction()
             {
 
             }
 
-            JavaFunction(const std::string& functionName) : functionName(functionName)
+            template<typename... Extras>
+            JavaFunction(const std::string& functionName, Extras... extras) : functionName(functionName)
             {
+                this->extras = std::static_pointer_cast<JavaExtras>(
+                    std::make_shared<JavaExtrasTyped<Extras...>>(extras...)
+                );
+            }
 
+            template<typename E>
+            bool hasExtra() const
+            {
+                return extras->hasExtra<E>();
+            }
+
+            template<typename E>
+            E getExtra()
+            {
+                return extras->getExtra<E>();
             }
 
         
@@ -119,7 +139,9 @@ namespace jbind11
 
             }
 
-            NonStaticJavaFunction(const std::string& functionName, Function function) : JavaFunction<Return, Params...>(functionName), function(function)
+
+            template<typename... Extras>
+            NonStaticJavaFunction(const std::string& functionName, Function function, Extras... extras) : JavaFunction<Return, Params...>(functionName, extras...), function(function)
             {
 
             }
@@ -141,7 +163,7 @@ namespace jbind11
 
             std::string getFunctionDefinition(const std::string& canonicalClassName)
             {
-                return FunctionGenerator<Return, Params...>::generate(false, canonicalClassName,this->functionName);
+                return FunctionGenerator<Return, Params...>(this->extras).generate(false, canonicalClassName,this->functionName);
             }
     };
 
@@ -161,7 +183,8 @@ namespace jbind11
 
             }
 
-            StaticJavaFunction(const std::string& functionName, Function function) : JavaFunction<Return, Params...>(functionName), function(function)
+            template<typename... Extras>
+            StaticJavaFunction(const std::string& functionName, Function function, Extras... extras) : JavaFunction<Return, Params...>(functionName, extras...), function(function)
             {
 
             }
@@ -176,7 +199,7 @@ namespace jbind11
 
             std::string getFunctionDefinition(const std::string& canonicalClassName)
             {
-                return FunctionGenerator<Return, Params...>::generate(true, canonicalClassName, this->functionName);
+                return FunctionGenerator<Return, Params...>(this->extras).generate(true, canonicalClassName, this->functionName);
             }
     };
 }

@@ -64,5 +64,10 @@ namespace jbind11
             {
                 return JNIUtils::getJavaClassNameOfPrimitiveType<T>();
             }
+
+            static bool isGeneric()
+            {
+                return false;
+            }
     };
 }

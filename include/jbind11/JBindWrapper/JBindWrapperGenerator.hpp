@@ -16,9 +16,20 @@ namespace jbind11
             {
                 std::stringstream content;
 
+                std::string className;
+
+                if(javaClass->isGenericClass())
+                {
+;                    className = javaClass->getGenericJavaClassName();
+                }
+                else
+                {
+                    className = javaClass->getJavaClassName();
+                }
+
                 content  <<
                     "package " << packageName << ";"                                                        << "\n" <<
-                    "public class " << javaClass->getJavaClassName() << " extends jbind11.JBindWrapper"     << "\n" <<
+                    "public class " << className << " extends jbind11.JBindWrapper"     << "\n" <<
                     "{"                                                                                     << "\n\n";
                     // "\tprivate long nativeJavaHandle;"                                                      << "\n" <<
                     // "\tprivate native Object nativeGet(String fieldName);"                                  << "\n" <<

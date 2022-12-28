@@ -15,8 +15,9 @@
 #include "JavaAttribute/JavaAttribute.hpp"
 
 #include "JavaHandle/JavaHandle.hpp"
-
 #include "JavaFunction/JavaFunction.hpp"
+#include "JavaExtras/JavaExtrasTyped.hpp"
+#include "JavaExtras/GenericClass.hpp"
 
 namespace jbind11
 {
@@ -39,6 +40,7 @@ namespace jbind11
             bool ownedByPackage = false;
 
             AbstractPackageHandle* packageHandle = nullptr;
+            std::shared_ptr<JavaExtras> extras = nullptr;
 
             void registerName()
             {
@@ -71,10 +73,28 @@ namespace jbind11
             }
 
         public:
-
             JavaClass()
             {
+                
+            }
 
+            // template<typename... Extras>
+            // JavaClass(Extras... extras)
+            // {
+            //     this->extras = std::static_pointer_cast<JavaExtras>(
+            //         std::make_shared<JavaExtrasTyped<Extras...>>(extras...)
+            //     );
+            // }
+
+            template<typename JavaPackage, typename... Extras>
+            JavaClass(JavaPackage& package, const char* className, Extras... extras)
+            {
+                this->className = className;
+                this->packageHandle = new JavaPackageHandle<JavaPackage, JavaClass<T>>(&package);
+                this->ownedByPackage = false;
+                this->extras = std::static_pointer_cast<JavaExtras>(
+                    std::make_shared<JavaExtrasTyped<Extras...>>(extras...)
+                );
             }
 
             ~JavaClass()
@@ -93,13 +113,7 @@ namespace jbind11
                 packageHandle->transferOwnershipOfClassToPackage(static_cast<AbstractJavaClass*>(this), ownedByPackage);
             }
 
-            template<typename JavaPackage>
-            JavaClass(JavaPackage& package, const char* className)
-            {
-                this->className = className;
-                this->packageHandle = new JavaPackageHandle<JavaPackage, JavaClass<T>>(&package);
-                this->ownedByPackage = false;
-            }
+            
 
             bool hasField(const std::string& fieldName)
             {
@@ -139,6 +153,20 @@ namespace jbind11
                 return handle;
             }
 
+            template<typename E>
+            bool hasExtra() const
+            {
+                return extras->hasExtra<E>();
+            }
+
+            template<typename E>
+            E getExtra()
+            {
+                return extras->getExtra<E>();
+            }
+
+
+
            
             // E.g.:
             /* 
@@ -168,14 +196,14 @@ namespace jbind11
                 return *attribute.get();
             }
 
-            template<typename Class, typename Return, typename... Params>
-            JavaClass& def(const char* name, Return (Class::*p)(Params...))
+            template<typename Class, typename Return, typename... Params, typename... Extras>
+            JavaClass& def(const char* name, Return (Class::*p)(Params...), Extras... extras)
             {
                 typedef NonStaticJavaFunction<Class, Return, Params...> Function;
                 std::string nameStr = name;
                 
                 std::shared_ptr<Function> func =
-                    std::make_shared<Function>(nameStr, p);
+                    std::make_shared<Function>(nameStr, p, extras...);
 
                 this->javaFunctions.insert(
                         std::make_pair(name, 
@@ -184,14 +212,14 @@ namespace jbind11
                 return *this;
             }
 
-            template<typename Return, typename... Params>
-            JavaClass& def_static(const char* name, Return (*p)(Params...))
+            template<typename Return, typename... Params, typename... Extras>
+            JavaClass& def_static(const char* name, Return (*p)(Params...), Extras... extras)
             {
                 typedef StaticJavaFunction<Return, Params...> Function;
                 std::string nameStr = name;
                 
                 std::shared_ptr<Function> func =
-                    std::make_shared<Function>(nameStr, p);
+                    std::make_shared<Function>(nameStr, p, extras...);
 
                 this->javaFunctions.insert(
                         std::make_pair(name, 
@@ -236,7 +264,20 @@ namespace jbind11
                 return functionNames;
             }
 
+            virtual bool isGenericClass()
+            {
+                return this->hasExtra<GenericClass>();
+            }
 
+            virtual const std::string getGenericJavaClassName()
+            {
+                std::string className = this->getJavaClassName();
+                if(this->hasExtra<GenericClass>())
+                {
+                    className += this->getExtra<GenericClass>().getGenericTag();
+                }
+                return className;
+            }
 
     };
 }

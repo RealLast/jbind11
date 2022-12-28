@@ -27,6 +27,11 @@ namespace jbind11
             virtual AbstractJavaFunction* getFunction(const std::string& functionName) = 0;
             virtual std::vector<std::string> getFunctionNames() = 0;
 
+            virtual bool isGenericClass() = 0;
+            // returns classname<T> (T specified by GenericClass() extra, could also be "U" or sth else),
+            // if class is generic, otherwise classname.
+            virtual const std::string getGenericJavaClassName() = 0;
+
             
 
 
