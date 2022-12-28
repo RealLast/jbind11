@@ -33,5 +33,10 @@ namespace jbind11
             {
                 return Caster<IntegerType>::canonicalTypeName();
             }
+
+            static bool isGeneric()
+            {
+                return false;
+            }
     };
 }

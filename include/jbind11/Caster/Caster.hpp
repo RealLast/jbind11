@@ -84,6 +84,19 @@ namespace jbind11
 
                 return javaClass->getCanonicalName();
             }
+
+            static bool isGeneric()
+            {
+                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<T>>();
+
+                if(javaClass == nullptr)
+                {
+                    JBIND_THROW("Failed to retrieve JBindWrapper clss for native C++ class \"" << TypeName<T>::get() << "\". No wrapper was registered for this native type.\n"
+                    << "Make sure to add a wrapper for this class in an appropriate JBIND_MODULE declaration.");
+                }
+
+                return javaClass->isGenericClass();
+            }
     };
 }
 

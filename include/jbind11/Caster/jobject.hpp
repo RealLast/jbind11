@@ -57,5 +57,10 @@ namespace jbind11
             {
                 return "java.lang.Object";
             }
+            
+            static bool isGeneric()
+            {
+                return false;
+            }
     };
 }

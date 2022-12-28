@@ -102,5 +102,10 @@ namespace jbind11
             {
                 return JNIUtils::getJavaClassNameOfPrimitiveType<NoPointerType>();
             }
+
+            static bool isGeneric()
+            {
+                return false;
+            }
     };
 }
