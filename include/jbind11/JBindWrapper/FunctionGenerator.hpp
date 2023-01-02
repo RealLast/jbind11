@@ -24,7 +24,7 @@ namespace jbind11
 
             template<typename U>
             typename std::enable_if<std::is_void<U>::value, std::string>::type
-            typeName()
+            static typeName()
             {
                 return "void";
             }
