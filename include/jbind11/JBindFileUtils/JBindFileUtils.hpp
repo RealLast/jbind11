@@ -68,7 +68,7 @@ namespace jbind11
 
         #ifdef _WIN32
 
-            bool isDots(const char* str)
+            static bool isDots(const char* str)
             {
                 if (strcmp(str, ".") && strcmp(str, ".."))
                 {
@@ -77,7 +77,7 @@ namespace jbind11
                 return true;
             }
 
-            bool removeDirectoryRecursively(const std::string& path)
+            static bool removeDirectoryRecursively(const std::string& path)
             {
                 HANDLE hFind;  // file handle
                 WIN32_FIND_DATAA findFileData;
