@@ -3,6 +3,8 @@
 
 #include "JavaHandle/JavaHandle.hpp"
 #include "JavaPackage/JavaPackageManager.hpp"
+#include <chrono>
+#include <thread>
 using namespace jbind11;
 
 static AbstractJavaClass* findFirstParentClassThatIsAJBindClass(JNIEnv* env, jclass cls)
@@ -69,6 +71,11 @@ extern "C"
 
         JavaHandle* handle = javaClass->spawnNewHandle();
         handle->assignToObject(env, wrappedObject);
+    }
+
+    JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeFinalize(JNIEnv* env, jobject wrappedObject)
+    {
+        std::cout << "FINALIZE CALLED\n";
     }
 
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeSet(JNIEnv* env, jobject wrappedObject, jstring jfieldName, jobject value)
