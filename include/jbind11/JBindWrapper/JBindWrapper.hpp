@@ -71,6 +71,12 @@ extern "C"
         handle->assignToObject(env, wrappedObject);
     }
 
+    JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeFinalize(JNIEnv* env, jobject wrappedObject)
+    {
+        printf("native finalize called\n");
+        JavaHandle::removeAndDeleteHandleFromObject(env, wrappedObject);
+    }
+
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeSet(JNIEnv* env, jobject wrappedObject, jstring jfieldName, jobject value)
     {
         std::string fieldName = JNIUtils::toStdString(env, jfieldName);

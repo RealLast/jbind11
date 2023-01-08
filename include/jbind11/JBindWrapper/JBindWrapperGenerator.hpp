@@ -95,8 +95,10 @@ namespace jbind11
                     "\tprotected native java.lang.Object nativeInvoke(String functionName, java.util.ArrayList<java.lang.Object> stack);"           << "\n" <<
                     "\tprotected native static java.lang.Object nativeInvokeStatic(Class cls, String functionName, java.util.ArrayList<java.lang.Object> stack);"     << "\n" <<
                     "\tprotected native void nativeInit();"                                                                                         << "\n" <<
+                    "\tprotected native void nativeFinalize();"                                                                                     << "\n" <<
                     ""                                                                                                                              << "\n" <<
                     "\tpublic " << CLASS_NAME << "() { nativeInit(); }"                                                                             << "\n" <<
+                    "\tprotected void finalize() throws Throwable { nativeFinalize(); }"                                                                             << "\n" <<
                     "}";
                 
                 return JavaClassFile(CLASS_NAME, content.str());

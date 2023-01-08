@@ -36,7 +36,6 @@ namespace jbind11
                         << "An object with signature \"" + className << "\" was provided, but \"" + arraySignature + "\" was expected.")
                 }
 
-                std::cout << "is plain array, faster copy \n" << arraySignature << " " << className << "\n" << std::flush;
                
                 jsize size = env->GetArrayLength(static_cast<jarray>(javaObject));
                 result = std::vector<Value>(size);
