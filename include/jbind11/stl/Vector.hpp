@@ -84,7 +84,7 @@ namespace jbind11
                     return result;
                 }
 
-                // javaObject is native java type, hence we copy.
+                // javaObject is native java type (e.g. ArrayList<>), hence we copy.
 
                 JavaArrayList javaArrayList(javaObject);
 
@@ -92,7 +92,9 @@ namespace jbind11
 
                 for(size_t i = 0; i < javaArrayList.size(); i++)
                 {
-                    result.push_back(Caster<Value>::fromJavaObject(env, javaArrayList.get(i)));
+                    jobject object = javaArrayList.get(i);
+                    result.push_back(Caster<Value>::fromJavaObject(env, object));
+                    env->DeleteLocalRef(object);
                 }
 
                 return result;

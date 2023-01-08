@@ -34,11 +34,11 @@ namespace jbind11
                 return fieldID;
             }
 
-            template<typename T>
-            void setNativeData(T* value)
-            {
-                this->handleData->setNativeData(value);
-            }
+            // template<typename T>
+            // void setNativeData(T* value)
+            // {
+            //     this->handleData->setNativeData(value);
+            // }
 
             bool handleValid = false;
 
@@ -125,7 +125,7 @@ namespace jbind11
             template<typename T>
             void setNativeDataTakeOwnership(T* t)
             {
-                this->handleData->setNativeData(t);
+                this->handleData->setNativeDataTakeOwnership(t);
                 // handleData will delete t when
                 // it get's destructed.
             }

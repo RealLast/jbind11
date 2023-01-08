@@ -24,7 +24,7 @@ namespace jbind11
         private:
             AbstractJavaClass* javaClass;
 
-            void* rawPtr = nullptr;
+            std::shared_ptr<void> rawPtr = nullptr;
             jobject javaObject = nullptr;
 
             bool nativeDataAssigned = false;
@@ -48,9 +48,9 @@ namespace jbind11
             }
 
             template<typename T>
-            void setNativeData(T* value)
+            void setNativeDataTakeOwnership(T* value)
             {
-                this->rawPtr = static_cast<void*>(value);
+                this->rawPtr = std::static_pointer_cast<void>(std::shared_ptr<T>(value));
                 this->javaClass = getPackageManager().findClass<JavaClass<T>>();
 
                 if(this->javaClass == nullptr)
@@ -79,14 +79,14 @@ namespace jbind11
                 {
                     JBIND_THROW("Failed to get object reference from JavaHandle. Handle has not been initialized using set() before!");
                 }
-                return static_cast<T*>(this->rawPtr);    
+                return std::static_pointer_cast<T>(this->rawPtr).get();    
             }
 
             AbstractJavaClass* getJavaClass()
             {
                 if(!this->nativeDataAssigned)
                 {
-                    JBIND_THROW("Failed to get JavaClass from JavaHandle. Handle has not been initialized using setNativeData() before!");
+                    JBIND_THROW("Failed to get JavaClass from JavaHandle. Handle has not been initialized using setNativeDataTakeOwnership() before!");
                 }
                 return this->javaClass;
             }
