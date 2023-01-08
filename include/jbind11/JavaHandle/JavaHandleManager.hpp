@@ -28,6 +28,7 @@ namespace jbind11
                     if(*it == data)
                     {
                         this->registeredJavaObjects.erase(it);
+                        return;
                     }
                 }
             }
