@@ -1,7 +1,7 @@
 #pragma once
 #include "JavaField/AbstractJavaField.hpp"
 #include "JavaFunction/AbstractJavaFunction.hpp"
-
+#include <vector>
 namespace jbind11
 {
     class JavaHandle;
