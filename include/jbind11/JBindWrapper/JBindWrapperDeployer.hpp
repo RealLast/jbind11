@@ -93,9 +93,9 @@ namespace jbind11
 
 
         public:
-            void deployAllToDirectory(const std::string& basePath)
+            void deployAllToDirectory(const std::string& basePath, bool forceOverride = false)
             {
-                if(JBindFileUtils::directoryExists(basePath))
+                if(JBindFileUtils::directoryExists(basePath) && !forceOverride)
                 {
                     // Remove the directory recursively..
                     // This is necessary, because the user might have deleted some packages or classes
@@ -124,6 +124,10 @@ namespace jbind11
                     JBindFileUtils::removeDirectoryRecursively(basePath);
                 }
                 
+                if(forceOverride)
+                {
+                    JBindFileUtils::removeDirectoryRecursively(basePath);
+                }
 
                 // Returns false if directory does not exist but could not be created.
                 if(!JBindFileUtils::createDirectoryIfNotExists(basePath))
