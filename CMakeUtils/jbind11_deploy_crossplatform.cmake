@@ -1,10 +1,8 @@
 
 
 macro(jbind11_write_path_list_to_file file_path path_list correct_relatives)
-    message(${path_list})
 
     foreach(path ${path_list})
-        message(${correct_relatives})
         if(NOT IS_ABSOLUTE ${path} AND ${correct_relatives} MATCHES "1")
 
             file(APPEND ${file_path} "${CMAKE_CURRENT_LIST_DIR}/${path}\n")
@@ -43,7 +41,6 @@ macro(jbind11_create_and_run_deployment_project target output_path force_overrid
         "We can only deploy jbind11 files to a directory that does not contain a CMakeLists.txt " 
         "Alternatively, you can use jbind11_deploy_crossplatform_override, but BE AWARE THAT THIS DELETES EVERYTHING IN ${output_path} ! ")
     endif()
-    message("Creating ${output_path}")
     file(MAKE_DIRECTORY ${output_path})
     file(WRITE ${output_path}/CMakeLists.txt)
 
