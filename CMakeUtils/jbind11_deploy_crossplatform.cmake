@@ -33,7 +33,7 @@ macro(jbind11_write_include_host_jni file_path)
         include_directories(\${JNI_INCLUDE_DIRS})\n")
 endmacro()
 
-macro(jbind11_create_and_run_deployment_project target output_path force_override is_android)
+macro(jbind11_create_external_deployment_project target output_path force_override is_android)
     if(EXISTS "${output_path}/CMakeLists.txt" AND ${force_override} MATCHES "0")
         message(FATAL_ERROR "Cannot deploy jbind11 java files to ${output_path} for crossplatform-build because it contains a CMakeLists.txt "
         "Since you want to deploy for a different architecture (android) than your host system, we need to create an external cmake project "
@@ -99,25 +99,36 @@ macro(jbind11_create_and_run_deployment_project target output_path force_overrid
     )
 
    
-    add_custom_command(TARGET ${target} POST_BUILD
+   
+    #jbind11_run_deployer_for_target(${target} ${output_path} ${force_override})
+
+endmacro()
+
+macro(jbind11_run_deployment_project_after_target_was_built target output_path )
+        add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND touch CMakeLists.txt
+        WORKING_DIRECTORY ${output_path} 
+        COMMENT "Deploying java files."
+        )
+
+        add_custom_command(TARGET ${target} POST_BUILD
         COMMAND cmake . && cmake --build . -j
         WORKING_DIRECTORY ${output_path} 
         COMMENT "Deploying java files."
-    )
+        )
 
-    add_custom_target(CLEAN ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E remove -f "${output_path}/CMakeLists.txt"
-        COMMAND_EXPAND_LISTS
-    )
-    #jbind11_run_deployer_for_target(${target} ${output_path} ${force_override})
-
+    # add_custom_target(CLEAN ${target} POST_BUILD
+    # COMMAND ${CMAKE_COMMAND} -E remove -f "${output_path}/CMakeLists.txt"
+    # COMMAND_EXPAND_LISTS
+    # )
 endmacro()
 
 macro(jbind11_deploy_crossplatform target output_path)
 
     set(FORCE_OVERRIDE 0)
     set(IS_ANDROID 0)
-    jbind11_create_and_run_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_run_deployment_project_after_target_was_built(${target} ${output_path})
 
 endmacro()
 
@@ -125,7 +136,8 @@ macro(jbind11_deploy_crossplatform_override target output_path)
 
     set(FORCE_OVERRIDE 1)
     set(IS_ANDROID 0)
-    jbind11_create_and_run_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_run_deployment_project_after_target_was_built(${target} ${output_path})
 
 endmacro()
 
@@ -133,7 +145,8 @@ macro(jbind11_deploy_android target output_path)
 
     set(FORCE_OVERRIDE 0)
     set(IS_ANDROID 1)
-    jbind11_create_and_run_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_run_deployment_project_after_target_was_built(${target} ${output_path})
 
 endmacro()
 
@@ -141,6 +154,19 @@ macro(jbind11_deploy_android_override target output_path)
 
     set(FORCE_OVERRIDE 1)
     set(IS_ANDROID 1)
-    jbind11_create_and_run_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+    jbind11_run_deployment_project_after_target_was_built(${target} ${output_path})
 
+endmacro()
+
+macro(jbind11_create_external_deployment_project_android target output_path)
+    set(FORCE_OVERRIDE 0)
+    set(IS_ANDROID 1)
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
+endmacro()
+
+macro(jbind11_create_external_deployment_project_android_override target output_path)
+    set(FORCE_OVERRIDE 1)
+    set(IS_ANDROID 1)
+    jbind11_create_external_deployment_project(${target} ${output_path} ${FORCE_OVERRIDE} ${IS_ANDROID})
 endmacro()

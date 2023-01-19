@@ -155,7 +155,7 @@ namespace jbind11
             nativeInvokeStaticReturn(const std::string& canonicalClassName, const std::string& functionName)
             {
                 std::stringstream ss;
-                ss << "\t\tjava.lang.Object result = nativeInvokeStatic(" << canonicalClassName << "\"" << functionName << "\", invocationStack);\n";
+                ss << "\t\tjava.lang.Object result = nativeInvokeStatic(" << canonicalClassName << ".class, \"" << functionName << "\", invocationStack);\n";
                 ss << "\t\treturn (" << returnName<Return>() << ") result;";
                 return ss.str();
             }
