@@ -61,6 +61,18 @@ namespace jbind11
                 this->nativeDataAssigned = true;
             }
 
+            template<typename T>
+            void overrideNativeData(std::shared_ptr<T> data)
+            {
+                if(!this->nativeDataAssigned)
+                {
+                    JBIND_THROW("Failed to override native data of type \"" << TypeName<T>::get() << "\"\nOverride is only possible if data has been previously assigned to this handle, however no data was assigned yet.");
+
+                } 
+
+                this->rawPtr = std::static_pointer_cast<void>(data);
+            }
+
             void setJavaObjectReference(jobject javaObject)
             {
                 this->javaObject = javaObject;

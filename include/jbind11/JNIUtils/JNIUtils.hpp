@@ -8,6 +8,7 @@
 #include "PrimitiveUtils/PrimitiveArray.hpp"
 #include "PrimitiveUtils/PrimitiveArrayTypes.hpp"
 #include "PrimitiveUtils/PrimitiveToNativePrimitive.hpp"
+#include "PrimitiveUtils/PrimitiveFieldUtils.hpp"
 #include "ClassFactoryUtils.hpp"
 #include "StringUtils.hpp"
 #include "FieldUtils.hpp"
