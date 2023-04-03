@@ -17,7 +17,7 @@ macro(jbind11_write_include_host_jni file_path)
         # For deployment, we dont bother using the correct Java version, as we just need JNI.
         # For that case, we might ship jni ourselves? Should do a JNI stub    
         "
-        include_directories(${JBIND11_CMAKE_UTILS_PATH}/../jni_fallback)
+        include_directories(${JBIND11_CMAKE_UTILS_PATH}/../jni_stub)
         \n")
 endmacro()
 
