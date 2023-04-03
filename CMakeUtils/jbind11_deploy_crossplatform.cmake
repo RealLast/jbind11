@@ -1,4 +1,4 @@
-
+SET(JBIND11_CMAKE_UTILS_PATH ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 macro(jbind11_write_path_list_to_file file_path path_list correct_relatives)
 
@@ -14,23 +14,11 @@ endmacro()
 
 macro(jbind11_write_include_host_jni file_path)
     file(APPEND ${file_path}
-        "find_package(Java 18 REQUIRED Development)
-        include(UseJava)
-
-        ## NOTE remove these JAVA*INCLUDE lines when this is fixed https://gitlab.kitware.com/cmake/cmake/-/issues/23364
-        set(JAVA_INCLUDE_PATH \"\$ENV{JAVA_HOME}/include\")
-        find_path(JAVA_INCLUDE_PATH2 NAMES jni_md.h jniport.h
-                PATHS ${JAVA_INCLUDE_PATH}
-                ${JAVA_INCLUDE_PATH}/darwin
-                ${JAVA_INCLUDE_PATH}/win32
-                ${JAVA_INCLUDE_PATH}/linux
-                )
-        set(JAVA_AWT_INCLUDE_PATH \"\$ENV{JAVA_HOME}/include\")
-        ##
-
-        find_package(JNI REQUIRED)
-
-        include_directories(\${JNI_INCLUDE_DIRS})\n")
+        # For deployment, we dont bother using the correct Java version, as we just need JNI.
+        # For that case, we might ship jni ourselves? Should do a JNI stub    
+        "
+        include_directories(${JBIND11_CMAKE_UTILS_PATH}/../jni_fallback)
+        \n")
 endmacro()
 
 macro(jbind11_create_external_deployment_project target output_path force_override is_android)

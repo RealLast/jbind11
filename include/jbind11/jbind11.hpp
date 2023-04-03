@@ -1,6 +1,6 @@
 #pragma once
 
-#include <jni.h>
+#include "jni.h"
 #include "JavaPackage/JavaPackageRegistrar.hpp"
 #include "JavaClass/JavaClass.hpp"
 #include "JavaHandle/JavaHandle.hpp"
