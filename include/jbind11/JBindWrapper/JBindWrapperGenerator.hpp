@@ -2,6 +2,7 @@
 
 #include "JavaPackage/JavaPackage.hpp"
 #include "JavaPackage/JavaPackageManager.hpp"
+#include "JavaExtras/StaticBlock.hpp"
 
 #include "JBindWrapper/JavaClassFile.hpp"
 
@@ -20,7 +21,7 @@ namespace jbind11
 
                 if(javaClass->isGenericClass())
                 {
-;                    className = javaClass->getGenericJavaClassName();
+                    className = javaClass->getGenericJavaClassName();
                 }
                 else
                 {
@@ -35,6 +36,15 @@ namespace jbind11
                     // "\tprivate native Object nativeGet(String fieldName);"                                  << "\n" <<
                     // "\tprivate native void nativeSet(String fieldName, Object value);"                      << "\n\n";
 
+                if(javaClass->hasStaticBlock())
+                {
+                    StaticBlock block = javaClass->getStaticBlock();
+                    content <<
+                        "\tstatic\n"                            <<
+                        "\t{\n"                                 <<
+                        "\t\t" << block.getBlockCode()  << "\n" <<
+                        "\t}\n\n";
+                }
 
                 std::vector<std::string> fieldNames = javaClass->getFieldNames();
                 for(size_t i = 0; i < fieldNames.size(); i++)

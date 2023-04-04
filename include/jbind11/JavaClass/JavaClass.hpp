@@ -279,6 +279,18 @@ namespace jbind11
                 return className;
             }
 
+            
+            virtual bool hasStaticBlock()
+            {
+                return this->hasExtra<StaticBlock>();
+            }
+
+            StaticBlock getStaticBlock()
+            {
+                return this->getExtra<StaticBlock>();
+            }
+
+
     };
 }
 
