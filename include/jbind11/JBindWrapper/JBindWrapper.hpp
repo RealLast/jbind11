@@ -68,7 +68,12 @@ extern "C"
         }
 
         JavaHandle* handle = javaClass->spawnNewHandle();
-        handle->assignToObject(env, wrappedObject);
+
+        // Like global references, weak global references remain valid across native method calls and across different threads.
+        // We make sure that other native functions can access the wrapped object as long as it is not garbage collected by using weak global references.
+        // If we wouldn't do that, than the wrappedObject ptr stored in the handle will be invalid as soon as we leave the nativeInit function.
+        // Any try to access the java object by other native functions via the handle, would therefore fail.
+        handle->assignToObject(env, env->NewWeakGlobalRef(wrappedObject));
     }
 
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeFinalize(JNIEnv* env, jobject wrappedObject)

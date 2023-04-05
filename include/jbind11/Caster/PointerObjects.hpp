@@ -100,7 +100,17 @@ namespace jbind11
 
             static std::string canonicalTypeName()
             {
-                return JNIUtils::getJavaClassNameOfPrimitiveType<NoPointerType>();
+                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<NoPointerType>>();
+
+                if(javaClass == nullptr)
+                {
+                    JBIND_THROW("Failed to get canonical type name of JBindWrapper for native C++ class \"" << TypeName<T>::get() << "\". No wrapper was registered for this native type.\n"
+                    << "Make sure to add a wrapper for this class in an appropriate JBIND_MODULE declaration."
+                    << "This usually means that there is at least one data type that has a wrapper and in that wrapper registered a member of type " << TypeName<T>::get() << "\n."
+                    << "In other words: There is one data type that depends on " << TypeName<T>::get() << " having a jbind wrapper.");
+                }
+
+                return javaClass->getCanonicalName();
             }
 
             static bool isGeneric()
