@@ -78,7 +78,6 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeFinalize(JNIEnv* env, jobject wrappedObject)
     {
-        printf("native finalize called\n");
         JavaHandle::removeAndDeleteHandleFromObject(env, wrappedObject);
     }
 

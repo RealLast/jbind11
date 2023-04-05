@@ -26,7 +26,6 @@ namespace jbind11
 
             static jfieldID getHandleField(JNIEnv* env, jobject obj)
             {
-                std::cout << obj << "\n";
                 jclass c = env->GetObjectClass(obj);
                 // J is the type signature for long:
                 jfieldID fieldID = env->GetFieldID(c, "nativeJavaHandle", "J");
