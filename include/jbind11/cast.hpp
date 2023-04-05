@@ -7,7 +7,7 @@
 #include "Caster/jstring.hpp"
 #include "Caster/Enum.hpp"
 
-#include "stl/stl.hpp"
+#include "StandardTypes/StandardTypes.hpp"
 #include "JNIUtils/JNIUtils.hpp"
 
 namespace jbind11
