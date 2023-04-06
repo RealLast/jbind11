@@ -21,7 +21,7 @@ static AbstractJavaClass* findFirstParentClassThatIsAJBindClass(JNIEnv* env, jcl
             return nullptr;
         }
 
-        javaClass = getPackageManager().findClassByCanonicalName(name);
+        javaClass = JavaPackageManager::getInstance()->findClassByCanonicalName(name);
 
         if(javaClass != nullptr)
         {
@@ -38,7 +38,7 @@ extern "C"
     {
         std::string canonicalClassName = JNIUtils::getNameOfClassOfObject(env, wrappedObject);
 
-        AbstractJavaClass* javaClass = getPackageManager().findClassByCanonicalName(canonicalClassName);
+        AbstractJavaClass* javaClass = JavaPackageManager::getInstance()->findClassByCanonicalName(canonicalClassName);
         
         if(javaClass == nullptr)
         {
@@ -125,7 +125,7 @@ extern "C"
         // of JavaHandle, AbstractJavaClass and AbstractJavaField.
         std::string canonicalClassName = JNIUtils::getClassName(JNIUtils::getEnv(), staticClass);
         
-        AbstractJavaClass* javaClass = getPackageManager().findClassByCanonicalName(canonicalClassName);
+        AbstractJavaClass* javaClass = JavaPackageManager::getInstance()->findClassByCanonicalName(canonicalClassName);
         
         if(javaClass == nullptr)
         {

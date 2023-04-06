@@ -47,7 +47,7 @@ namespace jbind11
                 // about the lifetime of value.
 
                 // TODO: allow cast objects without copy, pass it as shared_ptr or as rvalue reference.
-                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<T>>();
+                AbstractJavaClass* javaClass = JavaPackageManager::getInstance()->findClass<JavaClass<T>>();
 
                 if(javaClass == nullptr)
                 {
@@ -74,7 +74,7 @@ namespace jbind11
 
             static std::string canonicalTypeName()
             {
-                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<T>>();
+                AbstractJavaClass* javaClass = jbind11::JavaPackageManager::getInstance()->findClass<JavaClass<T>>();
 
                 if(javaClass == nullptr)
                 {
@@ -89,7 +89,7 @@ namespace jbind11
 
             static bool isGeneric()
             {
-                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<T>>();
+                AbstractJavaClass* javaClass = JavaPackageManager::getInstance()->findClass<JavaClass<T>>();
 
                 if(javaClass == nullptr)
                 {

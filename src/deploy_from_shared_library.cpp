@@ -2,6 +2,7 @@
 #include "jbind11.hpp"
 #include "jbind11/jbind11_macros.hpp"
 #include "JBindWrapper/JBindWrapperDeployer.hpp"
+#include "JavaPackage/JavaPackageManager.hpp"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -32,12 +33,18 @@ int main(int argc, char *argv[])
     std::cout << "loading shared library " << libraryPath << "\n";
 
     #ifdef _WIN32
+    // Corresponds to RTLD_NOW | RTLD_LOCAL
     HMODULE handle = LoadLibraryA(libraryPath.c_str());
+
+    // As Windows does not have the concept of RTLD_GLOBAL, each 
+    // unit shares their own data segment. That means, each DLL has it's own copy
+    // of static or global variables. Therefore, we cannot easily use the package manager,
+    // but have to retrieve it manually using a function.
     #else
     void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_GLOBAL);
     #endif
 
-    java::getPackageManager().initializePackages();
+    jbind11::getPackageManager()->initializePackages();
     java::JBindWrapperDeployer deployer;
     deployer.deployAllToDirectory(path, forceOverride);
 }

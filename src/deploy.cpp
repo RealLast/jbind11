@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         forceOverride = strcmp(argv[2], "1") == 0;
     }
 
-    java::getPackageManager().initializePackages();
+    java::JavaPackageManager::getInstance()->initializePackages();
     java::JBindWrapperDeployer deployer;
     deployer.deployAllToDirectory(path, forceOverride);
 }

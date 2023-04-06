@@ -51,7 +51,7 @@ namespace jbind11
             void setNativeDataTakeOwnership(T* value)
             {
                 this->rawPtr = std::static_pointer_cast<void>(std::shared_ptr<T>(value));
-                this->javaClass = getPackageManager().findClass<JavaClass<T>>();
+                this->javaClass = JavaPackageManager::getInstance()->findClass<JavaClass<T>>();
 
                 if(this->javaClass == nullptr)
                 {

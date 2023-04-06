@@ -3,7 +3,7 @@ macro(jbind11_run_deployer_for_target target output_path force_override)
     # Target refers to the shared library.
     get_property(TARGET_LOCATION TARGET ${target} PROPERTY LOCATION)
 
-    add_custom_command(TARGET ${target} POST_BUILD
+    add_custom_command(TARGET jbind11_wrapper_deployer_${target} POST_BUILD
         COMMAND ${DEPLOYER_EXECUTABLE_LOCATION} ${TARGET_LOCATION} ${output_path} ${force_override}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Loading library and deploying java files."

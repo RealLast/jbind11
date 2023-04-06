@@ -12,9 +12,11 @@ namespace jbind11
     {
         public:
         
-            JavaPackageRegistrar(JavaPackage* package, void (*initializerFunction)(JavaPackage& package)) 
+            JavaPackageRegistrar(volatile JavaPackage* package, void (*initializerFunction)(JavaPackage& package)) 
             {
-                getPackageManager().registerPackage(std::move(*package), JavaPackageInitializeFunctionInvoker(initializerFunction));
+                JavaPackage* ptr = const_cast<JavaPackage*>(package);
+                std::cout << "Registering java package " << ptr->getPackageName() << "\n";
+                JavaPackageManager::getInstance()->registerPackage(std::move(*ptr), JavaPackageInitializeFunctionInvoker(initializerFunction));
             }
     };
 }

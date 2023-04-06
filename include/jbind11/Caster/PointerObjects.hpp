@@ -100,7 +100,7 @@ namespace jbind11
 
             static std::string canonicalTypeName()
             {
-                AbstractJavaClass* javaClass = getPackageManager().findClass<JavaClass<NoPointerType>>();
+                AbstractJavaClass* javaClass = JavaPackageManager::getInstance()->findClass<JavaClass<NoPointerType>>();
 
                 if(javaClass == nullptr)
                 {

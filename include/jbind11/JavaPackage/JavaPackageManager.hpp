@@ -2,12 +2,15 @@
 
 #include "JavaPackage/JavaPackage.hpp"
 #include "JavaPackageInitializeFunctionInvoker.hpp"
+#include "JBindSingleton.hpp"
+
 #include <vector>
 #include <memory.h>
 #include <iostream>
 namespace jbind11
 {
-    class JavaPackageManager
+
+    class JavaPackageManager : public JBindSingleton<JavaPackageManager>
     {
         private:
             std::vector<std::unique_ptr<JavaPackage>> javaPackages;
@@ -87,6 +90,8 @@ namespace jbind11
 
             void initializePackages()
             {
+                std::cout << this << "\n";
+                std::cout << "Num packages " << javaPackages.size() << "\n";
                 for(size_t i = 0; i < javaPackages.size(); i++)
                 {
                     std::unique_ptr<JavaPackage>& packagePtr = javaPackages[i];
@@ -99,9 +104,6 @@ namespace jbind11
 
     };
 
-    inline JavaPackageManager& getPackageManager()
-    {
-        static JavaPackageManager* packageManager = new JavaPackageManager();
-        return *packageManager;
-    }
+    extern JavaPackageManager* getPackageManager();
 }
+
