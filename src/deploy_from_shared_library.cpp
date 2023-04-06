@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     std::cout << "loading shared library " << libraryPath << "\n";
 
     #ifdef _WIN32
-    HMODULE LoadLibraryA(libraryPath.c_str());
+    HMODULE handle = LoadLibraryA(libraryPath.c_str());
     #else
     void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_GLOBAL);
     #endif
