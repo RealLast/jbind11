@@ -250,7 +250,7 @@ namespace jbind11
         #endif
 
         #ifdef _WIN32
-        static bool FileUtils::getAllFilesInDirectoryRecursively(std::string path, std::vector<std::string>& output)
+        static bool getAllFilesInDirectoryRecursively(std::string path, std::vector<std::string>& output)
         {
             HANDLE hFind;  // file handle
             WIN32_FIND_DATAA findFileData;
