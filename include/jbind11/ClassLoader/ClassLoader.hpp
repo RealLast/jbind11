@@ -92,8 +92,6 @@ namespace jbind11
 
             JNIEnv* getEnv() 
             {
-                std::cout << std::flush;
-
                 if(jvm == nullptr)
                 {
                     JBIND_THROW("Error, ClassLoader::getEnv() was called without prior call to onLoad. Please make sure that jbind11::ClassLoader::onLoad "
