@@ -73,7 +73,16 @@ extern "C"
         // We make sure that other native functions can access the wrapped object as long as it is not garbage collected by using weak global references.
         // If we wouldn't do that, than the wrappedObject ptr stored in the handle will be invalid as soon as we leave the nativeInit function.
         // Any try to access the java object by other native functions via the handle, would therefore fail.
+
+        // Behavior on Android vs standalone Java seems to be different? ... need to investigate this in the future.
+        // TODO: Investigate this.
+        #ifndef __ANDROID__
+        // The following leads to an error on android and does not seem to perform as expected. It results in a weak global ref table overflow..
         handle->assignToObject(env, env->NewWeakGlobalRef(wrappedObject));
+        #else
+        // The following, however, does not work well with standalone Java, as it will result in a segfault for the reasons mentioned above.. 
+        handle->assignToObject(env, wrappedObject);
+        #endif
     }
 
     JNIEXPORT void JNICALL Java_jbind11_JBindWrapper_nativeFinalize(JNIEnv* env, jobject wrappedObject)
