@@ -26,7 +26,7 @@ namespace jbind11
 
             static std::string canonicalTypeName()
             {
-                return "java.lang.String";
+                return "java.util.function.Consumer";
             }
     };
 }   
