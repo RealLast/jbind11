@@ -9,8 +9,9 @@ namespace jbind11
         template<typename... Parameters>
         static jobject createObjectFromClassName(JNIEnv* env, std::string className, std::string constructorParameters, Parameters... parameters)
         {  
-            stringReplaceAll(className, ".", "/");
-            jclass cls = getClassLoader().findClass(env, className.c_str());
+            std::string javaClassName = className;
+            stringReplaceAll(javaClassName, ".", "/");
+            jclass cls = getClassLoader().findClass(env, javaClassName.c_str());
 
             if(cls == nullptr)
             {
