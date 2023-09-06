@@ -90,27 +90,27 @@ macro(jbind11_create_external_deployment_project target output_path force_overri
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove cmake_install.cmake
+            COMMAND ${CMAKE_COMMAND} -E remove cmake_install.cmake
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove CMakeCache.txt
+            COMMAND ${CMAKE_COMMAND} -E remove CMakeCache.txt
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove CMakeLists.txt
+            COMMAND ${CMAKE_COMMAND} -E remove CMakeLists.txt
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove jbind11_wrapper_deployer_JavaCLAID
+            COMMAND ${CMAKE_COMMAND} -E remove jbind11_wrapper_deployer_JavaCLAID
         )
         
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove -f CMakeFiles
+            COMMAND ${CMAKE_COMMAND} -E remove -f CMakeFiles
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
-            COMMAND /opt/homebrew/Cellar/cmake/3.23.2/bin/cmake -E remove -f MakeFile
+            COMMAND ${CMAKE_COMMAND} -E remove -f MakeFile
         )
 
         "
