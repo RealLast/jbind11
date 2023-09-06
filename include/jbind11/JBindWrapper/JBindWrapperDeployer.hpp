@@ -155,6 +155,9 @@ namespace jbind11
                 if(forceOverride)
                 {
                     JBindFileUtils::removeDirectoryRecursively(basePath);
+                    std::ofstream file(basePath + "/CMakeLists.txt");
+                    file.flush();
+                    file.close();
                 }   
 
                 // Returns false if directory does not exist but could not be created.

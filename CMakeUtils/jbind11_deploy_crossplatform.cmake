@@ -137,7 +137,7 @@ endmacro()
 
 macro(jbind11_run_deployment_project_after_target_was_built target output_path )
         add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND touch CMakeLists.txt
+        COMMAND ${CMAKE_COMMAND} -E touch CMakeLists.txt
         WORKING_DIRECTORY ${output_path} 
         COMMENT "Deploying java files."
         )
