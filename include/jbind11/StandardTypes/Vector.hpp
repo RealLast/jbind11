@@ -4,7 +4,7 @@
 
 #include <jni.h>
 #include "Caster/Caster.hpp"
-#include "Traits/is_specialization_of.hpp"
+#include "Traits/jbind11_is_specialization_of.hpp"
 #include <vector>
 
 #include "JavaNativeClasses/JavaArrayList.hpp"
@@ -16,7 +16,7 @@
 namespace jbind11
 {
     template<class T>
-    struct Caster<T, typename std::enable_if<is_specialization_of<T, std::vector>::value>::type> 
+    struct Caster<T, typename std::enable_if<jbind11_is_specialization_of<T, std::vector>::value>::type> 
     {
         private:
             typedef typename T::value_type Value;
@@ -128,7 +128,7 @@ namespace jbind11
     // Template specialization for SetterGenerator, since we accept either ArrayList<T> or T[] as input, if T is primitive.
     // Might think about adding support for List<T> and Vector<T>
     template<class T>
-    struct SetterGenerator<T, typename std::enable_if<is_specialization_of<T, std::vector>::value && std::is_arithmetic<typename T::value_type>::value>::type>
+    struct SetterGenerator<T, typename std::enable_if<jbind11_is_specialization_of<T, std::vector>::value && std::is_arithmetic<typename T::value_type>::value>::type>
     {
         typedef typename T::value_type ValueType;
         static std::string generateForArrayList(const std::string& fieldName)

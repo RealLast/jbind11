@@ -4,13 +4,13 @@
 
 // #include <jni.h>
 // #include "Caster.hpp"
-// #include "Traits/is_specialization_of.hpp"
+// #include "Traits/jbind11_is_specialization_of.hpp"
 // #include <map>
 
 // namespace jbind11
 // {
 //     template<class T>
-//     struct Caster<T, typename std::enable_if<std::is_specialization_of<T, std::map>::value>::type> 
+//     struct Caster<T, typename std::enable_if<std::jbind11_is_specialization_of<T, std::map>::value>::type> 
 //     {
 //         private:
 //             typedef T::key_type Key;

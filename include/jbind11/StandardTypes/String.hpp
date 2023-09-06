@@ -4,7 +4,7 @@
 
 #include <jni.h>
 #include "Caster/Caster.hpp"
-#include "Traits/is_specialization_of.hpp"
+#include "Traits/jbind11_is_specialization_of.hpp"
 #include <string>
 
 
