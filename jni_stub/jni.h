@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #define JNICALL
-#define JNIEXPORT     __attribute__((visibility("default")))
-#define JNIIMPORT     __attribute__((visibility("default")))
+#define JNIEXPORT    
+#define JNIIMPORT     
 #define JNI_VERSION_1_6 16
 #define JNI_VERSION_1_7 17
 #define JNI_VERSION_1_8 18
