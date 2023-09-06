@@ -53,6 +53,18 @@ macro(jbind11_create_external_deployment_project target output_path force_overri
     jbind11_write_path_list_to_file(${EXTERNAL_CMAKE_FILE} "${TARGET_SOURCES}" 1)
     file(APPEND ${EXTERNAL_CMAKE_FILE} ")\n\n")
 
+    file(APPEND ${EXTERNAL_CMAKE_FILE} 
+        "if(UNIX AND NOT APPLE)
+            target_link_libraries(jbind11_wrapper_deployer_${target} pthread)
+        endif()
+
+
+        if(WIN32)
+            # for Windows operating system in general
+            
+        endif()\n\n")
+
+
     if(NOT ${TARGET_LIBRARIES} MATCHES "TARGET_LIBRARIES-NOTFOUND")
         file(APPEND ${EXTERNAL_CMAKE_FILE} "target_link_libraries(jbind11_wrapper_deployer_${target}\n")
         jbind11_write_path_list_to_file(${EXTERNAL_CMAKE_FILE} "${TARGET_LIBRARIES}" 0)

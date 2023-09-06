@@ -2,7 +2,7 @@
 
 #include "JavaClass/AbstractJavaClass.hpp"
 #include <vector>
-#include <memory.h>
+#include <memory>
 #include <map>
 
 #include "jbind11_throw.hpp"
