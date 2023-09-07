@@ -118,6 +118,7 @@ namespace jbind11
                         difference.push_back(entryAfter);
                     }
                 }
+                std::cout << "Done checking\n";
             }
 
         public:
@@ -154,10 +155,8 @@ namespace jbind11
                          
                 if(forceOverride)
                 {
-                    JBindFileUtils::removeDirectoryRecursively(basePath);
-                    std::ofstream file(basePath + "/CMakeLists.txt");
-                    file.flush();
-                    file.close();
+//                    JBindFileUtils::removeDirectoryRecursively(basePath);
+                    
                 }   
 
                 // Returns false if directory does not exist but could not be created.
@@ -165,6 +164,7 @@ namespace jbind11
                 {
                     JBIND_THROW("Failed to deploy jbind11 wrappers. Cannot create directory \"" << basePath << "\"");
                 }
+
 
                 std::vector<std::string> existingFilesBefore;
                 if(!JBindFileUtils::getAllFilesInDirectoryRecursively(basePath, existingFilesBefore))
@@ -189,13 +189,14 @@ namespace jbind11
 
                 JBindPackageFileList fileList(createdFiles);
 
-
+                std::cout << "write to\n";
                 if(!fileList.writeTo(packageListFile))
                 {
                     JBIND_THROW("Error, cannot write file " << packageListFile << ".");
                 }
-
-
+                std::cout << "done write to\n";
+                
+               
             }
     };
 }

@@ -40,4 +40,7 @@ int main(int argc, char *argv[])
     java::getPackageManager().initializePackages();
     java::JBindWrapperDeployer deployer;
     deployer.deployAllToDirectory(path, forceOverride);
+
+
+    return 0;
 }

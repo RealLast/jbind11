@@ -28,4 +28,10 @@ int main(int argc, char *argv[])
     java::getPackageManager().initializePackages();
     java::JBindWrapperDeployer deployer;
     deployer.deployAllToDirectory(path, forceOverride);
+
+    
+    java::JBindFileUtils::createDirectoryIfNotExists(path + "/CMakeFiles");
+    java::JBindFileUtils::createDirectoryIfNotExists(path + "/CMakeFiles/test");
+
+    return 0;
 }

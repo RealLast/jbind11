@@ -61,7 +61,10 @@ macro(jbind11_create_external_deployment_project target output_path force_overri
 
         if(WIN32)
             # for Windows operating system in general
-            
+            if(MSVC)
+                add_definitions(/MP)
+            endif()
+
         endif()\n\n")
 
 
@@ -111,6 +114,10 @@ macro(jbind11_create_external_deployment_project target output_path force_overri
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove CMakeLists.txt
+        )
+
+        add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E touch CMakeLists.txt
         )
 
         add_custom_command(TARGET jbind11_wrapper_deployer_JavaCLAID POST_BUILD
